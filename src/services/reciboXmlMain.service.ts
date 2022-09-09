@@ -2,7 +2,7 @@ import * as xml2js from 'xml2js';
 
 import stringUtilService from './StringUtil.service';
 import fechaUtilService from './FechaUtil.service';
-import constanteService from './Constante.service';
+import constanteService from './constante.service';
 import jsonDteAlgoritmos from './reciboXmlAlgoritmos.service';
 import reciboXmlTotales from './reciboXmlTotales.service';
 import jsonDteIdentificacionDocumento from './reciboXmlIdentificacionDocumento.service';
@@ -271,6 +271,11 @@ class ReciboXmlMainService {
       data.autoFactura.documentoNumero = data.autoFactura.documento_numero;
     }
 
+    //Nota de Credito/Debito
+    if (data.nota_credito_debito) {
+      data.notaCreditoDebito = { ...data.nota_credito_debito };
+    }
+    
     //Remision
     if (data.remision?.tipo_responsable) {
       data.remision.tipoResponsable = data.remision.tipo_resonsable;
@@ -283,10 +288,6 @@ class ReciboXmlMainService {
 
         if (entrega.info_tarjeta) {
           entrega.infoTarjeta = { ...entrega.info_tarjeta };
-        }
-
-        if (entrega.infoTarjeta?.numero_tarjeta) {
-          entrega.infoTarjeta.numeroTarjeta = entrega.infoTarjeta.numero_tarjeta;
         }
 
         if (entrega.infoTarjeta?.razon_social) {
@@ -338,9 +339,6 @@ class ReciboXmlMainService {
         }
         if (item.precio_unitario) {
           item.precioUnitario = item.precio_unitario;
-        }
-        if (item.descuento_porcentaje) {
-          item.descuentoPorcentaje = item.descuento_porcentaje;
         }
         if (item.tolerancia_cantidad) {
           item.toleranciaCantidad = item.tolerancia_cantidad;
