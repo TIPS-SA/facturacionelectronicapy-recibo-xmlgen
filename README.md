@@ -10,7 +10,7 @@ Módulo NodeJS que genera el **archivo XML** para enviar a la **SET** _(Subsecre
 [API de la SET](https://www.npmjs.com/package/facturacionelectronicapy-setapi)<br/>
 [Generación KUDE](https://www.npmjs.com/package/facturacionelectronicapy-kude)<br/>
 
-
+xxx
 ## Empresas que utilizan éstos proyectos
 [JHF Ingeniería Informática](https://jhf.com.py/)<br/>
 [JR Ingeniería y Servicios](https://jringenieriayservicios.com/)<br/>
