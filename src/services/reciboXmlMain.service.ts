@@ -66,18 +66,15 @@ class ReciboXmlMainService {
 
     //this.generateDatosCondicionOperacionDE(params, data);
 
-    
-    this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config);  //Marcos
-    
+    this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config); //Marcos
 
-    
     if (data['documentosAsociados']) {
       this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDocumentosAsociados(
         params,
         data,
       );
     }
-  
+
     var builder = new xml2js.Builder({
       xmldec: {
         version: '1.0',
@@ -124,7 +121,6 @@ class ReciboXmlMainService {
         (data['fecha'] + '').substring(0, 4) +
         (data['fecha'] + '').substring(5, 7) +
         (data['fecha'] + '').substring(8, 10);
-
     } else {
       this.codigoSeguridad = stringUtilService.leftZero(data.codigoSeguridadAleatorio, 9);
       this.codigoControl = jsonDteAlgoritmos.generateCodigoControl(params, data, this.codigoSeguridad);
@@ -225,7 +221,6 @@ class ReciboXmlMainService {
         }
       }
     }
-
   }
 
   /**
@@ -234,7 +229,6 @@ class ReciboXmlMainService {
    * @param data
    */
   private addDefaultValues(data: any) {
-
     if (!data['moneda']) {
       data['moneda'] = 'PYG';
     }
@@ -327,16 +321,15 @@ class ReciboXmlMainService {
     if (data['descripcion'] && data['descripcion'].length > 0) {
       this.json['rDE']['recibo']['gOpeDE']['dInfoFisc'] = data['descripcion'];
     }
-
   }
 
   /**
-     * Genera los datos del timbrado
-     * 
-     * @param params 
-     * @param data 
-     * @param options 
-     */
+   * Genera los datos del timbrado
+   *
+   * @param params
+   * @param data
+   * @param options
+   */
   private generateDatosTimbrado(params: any, data: any) {
     this.json['rDE']['recibo']['gTimb'] = {
       iTiDE: data['tipoDocumento'],
@@ -395,7 +388,6 @@ class ReciboXmlMainService {
      * @param options 
      */
   private generateDatosGeneralesInherentesOperacion(params: any, data: any, config: XmlgenConfig) {
-
     let moneda = data['moneda'];
     if (!moneda && config.defaultValues === true) {
       moneda = 'PYG';
@@ -416,7 +408,6 @@ class ReciboXmlMainService {
       //Obligatorio informar dCondTiCam D018
       this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dTiCam'] = data['cambio'];
     }
-
   }
 
   /**
@@ -434,7 +425,6 @@ class ReciboXmlMainService {
 
     //Validar si el establecimiento viene en params
     let establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
-
 
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis'] = {
       dRucEm: params['ruc'].split('-')[0],
@@ -493,7 +483,6 @@ class ReciboXmlMainService {
    * @param options
    */
   private generateDatosGeneralesResponsableGeneracionDE(params: any, data: any) {
-    
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis']['gRespDE'] = {
       iTipIDRespDE: data['usuario']['documentoTipo'],
       dDTipIDRespDE: constanteService.tiposDocumentosIdentidades.filter(
@@ -507,16 +496,15 @@ class ReciboXmlMainService {
   }
 
   /**
-     * Datos generales del receptor del documento electrónico
-     * Pertenece al grupo de datos generales
-     * 
-     * 
-     * @param params 
-     * @param data 
-     * @param options 
-     */
+   * Datos generales del receptor del documento electrónico
+   * Pertenece al grupo de datos generales
+   *
+   *
+   * @param params
+   * @param data
+   * @param options
+   */
   private generateDatosGeneralesReceptorDE(params: any, data: any) {
-
     var regExpOnlyNumber = new RegExp(/^\d+$/);
 
     this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'] = {
@@ -528,16 +516,18 @@ class ReciboXmlMainService {
 
     if (data['cliente']['contribuyente']) {
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['iTiContRec'] = data['cliente']['tipoContribuyente'];
-      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dRucRec'] = (data['cliente']['ruc'].split('-')[0] + '').trim();
-      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDVRec'] = (data['cliente']['ruc'].split('-')[1] + '').trim();
+      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dRucRec'] = (
+        data['cliente']['ruc'].split('-')[0] + ''
+      ).trim();
+      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDVRec'] = (
+        data['cliente']['ruc'].split('-')[1] + ''
+      ).trim();
     }
     if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion']) {
       //Obligatorio completar D210
 
       if (this.validateError) {
-
         if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
-
           this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['iTipIDRec'] = data['cliente']['documentoTipo'];
 
           this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDTipIDRec'] =
@@ -865,7 +855,8 @@ class ReciboXmlMainService {
           'El tipo de Crédito en data.condicion.credito.tipo es 1 entonces data.condicion.credito.plazo es obligatorio',
         );*/
       }
-      this.json['rDE']['recibo']['gDtipDE']['gCamCond']['gPagCred']['dPlazoCre'] = data['condicion']['credito']['plazo'];
+      this.json['rDE']['recibo']['gDtipDE']['gCamCond']['gPagCred']['dPlazoCre'] =
+        data['condicion']['credito']['plazo'];
     }
 
     if (+data['condicion']['credito']['tipo'] === 2) {
@@ -876,7 +867,8 @@ class ReciboXmlMainService {
         );*/
       }
 
-      this.json['rDE']['recibo']['gDtipDE']['gCamCond']['gPagCred']['dCuotas'] = +data['condicion']['credito']['cuotas'];
+      this.json['rDE']['recibo']['gDtipDE']['gCamCond']['gPagCred']['dCuotas'] =
+        +data['condicion']['credito']['cuotas'];
     }
 
     if (data['condicion']['entregas'] && data['condicion']['entregas'].length > 0) {
@@ -934,7 +926,6 @@ class ReciboXmlMainService {
     xml = xml.replace(/\r?\n|\r/g, '');
     return xml;
   }
-
 }
 
 export default new ReciboXmlMainService();

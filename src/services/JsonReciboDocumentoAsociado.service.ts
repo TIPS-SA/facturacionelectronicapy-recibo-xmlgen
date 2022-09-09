@@ -2,7 +2,6 @@ import constanteService from './constante.service';
 import stringUtilService from './StringUtil.service';
 
 class JsonReciboDocumentoAsociadoService {
-
   public generateDocumentosAsociados(params: any, data: any) {
     const jsonResult = new Array();
     for (let i = 0; i < data.documentosAsociados.length; i++) {
@@ -11,7 +10,7 @@ class JsonReciboDocumentoAsociadoService {
     }
     return jsonResult;
   }
-    /**
+  /**
    *
    * @param params
    * @param doumentoAsociado
@@ -80,11 +79,7 @@ class JsonReciboDocumentoAsociadoService {
         throw new Error('Debe especificar la Fecha del Documento impreso Asociado en data.documentoAsociado.fecha');*/
       }
     }
-    if (
-      doumentoAsociado &&
-      doumentoAsociado['numeroRetencion'] &&
-      doumentoAsociado['numeroRetencion'].length >= 15
-    ) {
+    if (doumentoAsociado && doumentoAsociado['numeroRetencion'] && doumentoAsociado['numeroRetencion'].length >= 15) {
       jsonResult['dNumComRet'] = doumentoAsociado['numeroRetencion'].substring(0, 15);
     }
     if (
@@ -95,10 +90,8 @@ class JsonReciboDocumentoAsociadoService {
       jsonResult['dNumResCF'] = doumentoAsociado['resolucionCreditoFiscal'].substring(0, 15);
     }
 
-
     return jsonResult;
   }
-
 }
 
 export default new JsonReciboDocumentoAsociadoService();

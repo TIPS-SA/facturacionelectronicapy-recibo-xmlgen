@@ -58,10 +58,8 @@ class JSonReciboValidateService {
       }
     }
 
-    if (! (data['documentosAsociados'] && Array.isArray(data['documentosAsociados']))) {
-      this.errors.push(
-        'Dato/s de/los Documento/s asociado/s es/son obligatorio/s en data.documentosAsociados',
-      );
+    if (!(data['documentosAsociados'] && Array.isArray(data['documentosAsociados']))) {
+      this.errors.push('Dato/s de/los Documento/s asociado/s es/son obligatorio/s en data.documentosAsociados');
     }
 
     this.generateDatosDocumentosAsociadosValidate(params, data);
@@ -430,7 +428,9 @@ class JSonReciboValidateService {
       if (!data['cliente']['ciudad']) {
         this.errors.push('Obligatorio especificar la Ciudad en data.cliente.ciudad para Tipo de Documento != 4');
       } else {
-        if (constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0) {
+        if (
+          constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0
+        ) {
           this.errors.push(
             "Ciudad '" +
               data['cliente']['ciudad'] +
@@ -438,29 +438,24 @@ class JSonReciboValidateService {
               constanteService.ciudades.map((a: any) => a.codigo + '-' + a.descripcion),
           );
         }
-  
+
         //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
-        //valores de forma predeterminada, auque este valor sera sobre-escrito, caso el usuario envie 
+        //valores de forma predeterminada, auque este valor sera sobre-escrito, caso el usuario envie
         //data['cliente']['distrito'] y data['cliente']['departamento']
-        let objCiudad : any = constanteService.ciudades.filter(
-          (ciu) => ciu.codigo === +data['cliente']['ciudad'],
-        );
-  
-        console.log("ciudad", objCiudad);
-        let objDistrito : any = constanteService.distritos.filter(
-          (dis) => dis.codigo === +objCiudad[0]['distrito'],
-        );
-  
-        console.log("objDistrito", objDistrito);
-        let objDepartamento : any = constanteService.distritos.filter(
+        let objCiudad: any = constanteService.ciudades.filter((ciu) => ciu.codigo === +data['cliente']['ciudad']);
+
+        console.log('ciudad', objCiudad);
+        let objDistrito: any = constanteService.distritos.filter((dis) => dis.codigo === +objCiudad[0]['distrito']);
+
+        console.log('objDistrito', objDistrito);
+        let objDepartamento: any = constanteService.distritos.filter(
           (dep) => dep.codigo === +objDistrito[0]['departamento'],
         );
-  
-        console.log("objDepartamento", objDepartamento);
-        data['cliente']['distrito'] = objDistrito[0]['codigo'];
-        
-        data['cliente']['departamento'] = objDepartamento[0]['codigo'];
 
+        console.log('objDepartamento', objDepartamento);
+        data['cliente']['distrito'] = objDistrito[0]['codigo'];
+
+        data['cliente']['departamento'] = objDepartamento[0]['codigo'];
       }
 
       if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
@@ -468,8 +463,8 @@ class JSonReciboValidateService {
           this.errors.push('Obligatorio especificar el Distrito en data.cliente.distrito para Tipo de Documento != 4');
         } else {
           if (
-            constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito']).length ==
-            0
+            constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito'])
+              .length == 0
           ) {
             this.errors.push(
               "Distrito '" +
@@ -499,9 +494,8 @@ class JSonReciboValidateService {
                 constanteService.departamentos.map((a: any) => a.codigo + '-' + a.descripcion),
             );
           }
-        }  
+        }
       }
-      
     }
 
     constanteService.validateDepartamentoDistritoCiudad(
@@ -782,7 +776,7 @@ class JSonReciboValidateService {
     }
   }
 
-/**
+  /**
    *
    * @param params
    * @param data
@@ -808,27 +802,29 @@ class JSonReciboValidateService {
 
     //Validaciones
     if (
-      constanteService.tiposDocumentosAsociados.filter((um) => um.codigo === documentoAsociado['formato'])
-        .length == 0
+      constanteService.tiposDocumentosAsociados.filter((um) => um.codigo === documentoAsociado['formato']).length == 0
     ) {
       this.errors.push(
         "Formato de Documento Asociado '" +
           documentoAsociado['formato'] +
-          "' en data.documentosAsociados[" + i + "].formato no encontrado. Valores: " +
+          "' en data.documentosAsociados[" +
+          i +
+          '].formato no encontrado. Valores: ' +
           constanteService.tiposDocumentosAsociados.map((a) => a.codigo + '-' + a.descripcion),
       );
     }
 
     if (documentoAsociado['tipo'] == 2) {
       if (
-        constanteService.tiposDocumentosImpresos.filter(
-          (um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'],
-        ).length == 0
+        constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
+          .length == 0
       ) {
         this.errors.push(
           "Tipo de Documento impreso '" +
             documentoAsociado['tipoDocumentoImpreso'] +
-            "' en data.documentosAsociados[" + i + "].tipoDocumentoImpreso no encontrado. Valores: " +
+            "' en data.documentosAsociados[" +
+            i +
+            '].tipoDocumentoImpreso no encontrado. Valores: ' +
             constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
         );
       }
@@ -850,34 +846,45 @@ class JSonReciboValidateService {
       }
       if (!documentoAsociado['establecimiento']) {
         this.errors.push(
-          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentosAsociados[' + i + '].establecimiento',
+          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentosAsociados[' +
+            i +
+            '].establecimiento',
         );
       }
       if (!documentoAsociado['punto']) {
-        this.errors.push('Debe especificar el Punto del Documento impreso Asociado en data.documentosAsociados[' + i + '].punto');
+        this.errors.push(
+          'Debe especificar el Punto del Documento impreso Asociado en data.documentosAsociados[' + i + '].punto',
+        );
       }
 
       if (!documentoAsociado['numero']) {
-        this.errors.push('Debe especificar el Número del Documento impreso Asociado en data.documentosAsociados[' + i + '].numero');
+        this.errors.push(
+          'Debe especificar el Número del Documento impreso Asociado en data.documentosAsociados[' + i + '].numero',
+        );
       }
 
       if (!documentoAsociado['tipoDocumentoImpreso']) {
         this.errors.push(
-          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentosAsociados[' + i + '].tipoDocumentoImpreso',
+          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentosAsociados[' +
+            i +
+            '].tipoDocumentoImpreso',
         );
       }
 
       if (documentoAsociado['fecha']) {
         if ((documentoAsociado['fecha'] + '').length != 10) {
           this.errors.push(
-            'La Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha debe tener una longitud de 10 caracteres',
+            'La Fecha del Documento impreso Asociado en data.documentosAsociados[' +
+              i +
+              '].fecha debe tener una longitud de 10 caracteres',
           );
         }
       } else {
-        this.errors.push('Debe especificar la Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha');
+        this.errors.push(
+          'Debe especificar la Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha',
+        );
       }
     }
-
   }
 }
 

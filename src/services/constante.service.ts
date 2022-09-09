@@ -1,5 +1,4 @@
 class ConstanteService {
-
   monedas = [
     { codigo: 'AED', descripcion: 'Dirham' },
     { codigo: 'AFN', descripcion: 'Afghani' },
@@ -7481,7 +7480,15 @@ class ConstanteService {
       let distritoCiudadId = this.ciudades.filter((td) => td.codigo === ciudadId)[0]['distrito'];
 
       if (distritoId != distritoCiudadId) {
-        errores.push('El distrito (' + distritoId + ') pasado no pertenece a la Ciudad (' + ciudadId + ') especificada en ' + field + '.distrito');
+        errores.push(
+          'El distrito (' +
+            distritoId +
+            ') pasado no pertenece a la Ciudad (' +
+            ciudadId +
+            ') especificada en ' +
+            field +
+            '.distrito',
+        );
       }
     }
 
@@ -7489,7 +7496,15 @@ class ConstanteService {
       let departamentoDistritoId = this.distritos.filter((td) => td.codigo === distritoId)[0]['departamento'];
 
       if (departamentoId != departamentoDistritoId) {
-        errores.push('El departamento (' + departamentoId+ ') pasado no pertenece al Distrito (' + distritoId + ') especificado en ' + field + '.departamento');
+        errores.push(
+          'El departamento (' +
+            departamentoId +
+            ') pasado no pertenece al Distrito (' +
+            distritoId +
+            ') especificado en ' +
+            field +
+            '.departamento',
+        );
       }
     }
   }
