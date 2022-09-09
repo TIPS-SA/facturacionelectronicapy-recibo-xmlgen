@@ -5,8 +5,8 @@ import fechaUtilService from './FechaUtil.service';
 import constanteService from './constante.service';
 import jsonDteAlgoritmos from './reciboXmlAlgoritmos.service';
 import reciboXmlTotales from './reciboXmlTotales.service';
-import jsonDteIdentificacionDocumento from './reciboXmlIdentificacionDocumento.service';
-import jsonDeMainValidate from './reciboXmlMainValidate.service';
+import jsonDteIdentificacionDocumento from './JsonReciboDocumentoAsociado.service';
+import jsonDeMainValidate from './JsonReciboValidate.service';
 import { XmlgenConfig } from './type.interface.';
 
 class ReciboXmlMainService {
@@ -29,7 +29,7 @@ class ReciboXmlMainService {
 
         defaultConfig = Object.assign(defaultConfig, config);
 
-        resolve(this.generateXMLDeService(params, data, defaultConfig));
+        resolve(this.generateXMLReciboService(params, data, defaultConfig));
       } catch (error) {
         reject(error);
       }
@@ -42,7 +42,7 @@ class ReciboXmlMainService {
    * @param data
    * @returns
    */
-  private generateXMLDeService(params: any, data: any, config: XmlgenConfig) {
+  private generateXMLReciboService(params: any, data: any, config: XmlgenConfig) {
     this.removeUnderscoreAndPutCamelCase(data);
 
     this.addDefaultValues(data);
@@ -63,29 +63,21 @@ class ReciboXmlMainService {
     this.generateDatosTimbrado(params, data);
     this.generateDatosGenerales(params, data, config);
     //---
-    this.generateDatosEspecificosPorTipoDE(params, data, config);
 
-    this.generateDatosCondicionOperacionDE(params, data);
+    //this.generateDatosCondicionOperacionDE(params, data);
 
-    if (data['tipoDocumento'] != 7) {
-      this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config);
+    
+    this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config);  //Marcos
+    
+
+    
+    if (data['documentosAsociados']) {
+      this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDocumentosAsociados(
+        params,
+        data,
+      );
     }
-
-    if (
-      data['tipoDocumento'] == 1 ||
-      data['tipoDocumento'] == 4 ||
-      data['tipoDocumento'] == 5 ||
-      data['tipoDocumento'] == 6 ||
-      data['tipoDocumento'] == 7
-    ) {
-      //this.json['rDE']['recibo']['gDtipDE']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDatosDocumentoAsociado(params, data);
-      if (data['documentoAsociado']) {
-        this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDatosDocumentoAsociado(
-          params,
-          data,
-        );
-      }
-    }
+  
     var builder = new xml2js.Builder({
       xmldec: {
         version: '1.0',
@@ -123,56 +115,16 @@ class ReciboXmlMainService {
       const tipoEmisionCDC = this.codigoControl.substring(33, 34);
 
       const establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
-      if (establecimiento != establecimientoCDC) {
-        /*throw new Error(
-          "El Establecimiento '" +
-            establecimiento +
-            "'en data.establecimiento debe coincidir con el CDC reutilizado (" +
-            establecimientoCDC +
-            ')',
-        );*/
-      }
 
       const punto = stringUtilService.leftZero(data['punto'], 3);
-      if (punto != puntoCDC) {
-        /*throw new Error(
-          "El Punto '" + punto + "' en data.punto debe coincidir con el CDC reutilizado (" + puntoCDC + ')',
-        );*/
-      }
 
       const numero = stringUtilService.leftZero(data['numero'], 7);
-      if (numero != numeroCDC) {
-        /*throw new Error(
-          "El Numero de Documento '" +
-            numero +
-            "'en data.numero debe coincidir con el CDC reutilizado (" +
-            numeroCDC +
-            ')',
-        );*/
-      }
 
-      /*if (+data['tipoContribuyente'] != +tipoContribuyenteCDC) {
-        //throw new Error("El Tipo de Contribuyente '" + data['tipoContribuyente'] + "' en data.tipoContribuyente debe coincidir con el CDC reutilizado (" + tipoContribuyenteCDC + ")");
-      }*/
       const fecha =
         (data['fecha'] + '').substring(0, 4) +
         (data['fecha'] + '').substring(5, 7) +
         (data['fecha'] + '').substring(8, 10);
-      if (fecha != fechaCDC) {
-        /*throw new Error(
-          "La fecha '" + fecha + "' en data.fecha debe coincidir con el CDC reutilizado (" + fechaCDC + ')',
-        );*/
-      }
 
-      if (+data['tipoEmision'] != +tipoEmisionCDC) {
-        /*throw new Error(
-          "El Tipo de Emisión '" +
-            data['tipoEmision'] +
-            "' en data.tipoEmision debe coincidir con el CDC reutilizado (" +
-            tipoEmisionCDC +
-            ')',
-        );*/
-      }
     } else {
       this.codigoSeguridad = stringUtilService.leftZero(data.codigoSeguridadAleatorio, 9);
       this.codigoControl = jsonDteAlgoritmos.generateCodigoControl(params, data, this.codigoSeguridad);
@@ -190,26 +142,6 @@ class ReciboXmlMainService {
   private removeUnderscoreAndPutCamelCase(data: any) {
     if (data.tipo_documento) {
       data.tipoDocumento = data.tipo_documento;
-    }
-
-    if (data.tipo_contribuyente) {
-      data.tipoContribuyente = data.tipo_contribuyente;
-    }
-
-    if (data.tipo_emision) {
-      data.tipoEmision = data.tipo_emision;
-    }
-
-    if (data.tipo_transaccion) {
-      data.tipoTransaccion = data.tipo_transaccion;
-    }
-
-    if (data.tipo_impuesto) {
-      data.tipoImpuesto = data.tipo_impuesto;
-    }
-
-    if (data.condicion_anticipo) {
-      data.condicionAnticipo = data.condicion_anticipo;
     }
 
     if (data.condicion_tipo_cambio) {
@@ -247,38 +179,6 @@ class ReciboXmlMainService {
     }
     if (data.usuario?.documento_numero) {
       data.usuario.documentoNumero = data.usuario.documento_numero;
-    }
-
-    //Factura
-    if (data.factura?.fecha_envio) {
-      data.factura.fechaEnvio = data.usuario.fecha_envio;
-    }
-
-    //AutoFactura
-    if (data.auto_factura) {
-      data.autoFactura = { ...data.auto_factura };
-    }
-
-    if (data.autoFactura?.tipo_vendedor) {
-      data.autoFactura.tipoVendedor = data.autoFactura.tipo_vendedor;
-    }
-
-    if (data.autoFactura?.documentoTipo) {
-      data.autoFactura.documentoTipo = data.autoFactura.documentoTipo;
-    }
-
-    if (data.autoFactura?.documento_numero) {
-      data.autoFactura.documentoNumero = data.autoFactura.documento_numero;
-    }
-
-    //Nota de Credito/Debito
-    if (data.nota_credito_debito) {
-      data.notaCreditoDebito = { ...data.nota_credito_debito };
-    }
-    
-    //Remision
-    if (data.remision?.tipo_responsable) {
-      data.remision.tipoResponsable = data.remision.tipo_resonsable;
     }
 
     //Condicion entregas
@@ -326,173 +226,6 @@ class ReciboXmlMainService {
       }
     }
 
-    //Items
-    if (data.items && data.items?.length > 0) {
-      for (let i = 0; i < data.items.length; i++) {
-        const item = data.items[i];
-
-        if (item.partida_arancelaria) {
-          item.partidaArancelaria = item.partida_arancelaria;
-        }
-        if (item.unidad_medida) {
-          item.unidadMedida = item.unidad_medida;
-        }
-        if (item.precio_unitario) {
-          item.precioUnitario = item.precio_unitario;
-        }
-        if (item.tolerancia_cantidad) {
-          item.toleranciaCantidad = item.tolerancia_cantidad;
-        }
-        if (item.tolerancia_porcentaje) {
-          item.toleranciaPorcentaje = item.tolerancia_porcentaje;
-        }
-        if (item.cdc_anticipo) {
-          item.cdcAnticipo = item.cdc_anticipo;
-        }
-
-        if (item.iva_tipo) {
-          item.ivaTipo = item.iva_tipo;
-        }
-        if (item.iva_base) {
-          item.ivaBase = item.iva_base;
-        }
-        if (item.numero_serie) {
-          item.numeroSerie = item.numero_serie;
-        }
-        if (item.numero_pedido) {
-          item.numeroPedido = item.numero_pedido;
-        }
-        if (item.numero_seguimiento) {
-          item.numeroSeguimiento = item.numero_seguimiento;
-        }
-
-        //DNCP
-        if (item.dncp) {
-          if (item.dncp.codigo_nivel_general) {
-            item.dncp.codigoNivelGeneral = item.dncp.codigo_nivel_general;
-          }
-
-          if (item.dncp.codigo_nivel_especifico) {
-            item.dncp.codigoNivelEspecifico = item.dncp.codigo_nivel_especifico;
-          }
-
-          if (item.dncp.codigo_gtin_producto) {
-            item.dncp.codigoGtinProducto = item.dncp.codigo_gtin_producto;
-          }
-
-          if (item.dncp.codigo_nivel_paquete) {
-            item.dncp.codigoNivelPaquete = item.dncp.codigo_nivel_paquete;
-          }
-        }
-
-        //Importador
-        if (item.importador) {
-          if (item.importador.registro_importador) {
-            item.importador.registroImportador = item.importador.registro_importador;
-          }
-
-          if (item.registro_senave) {
-            item.registroSenave = item.registro_senave;
-          }
-
-          if (item.registro_entidad_comercial) {
-            item.registroEntidadComercial = item.registro_entidad_comercial;
-          }
-        }
-        //Sector Automotor
-        if (item.sector_automotor) {
-          if (item.sector_automotor.capacidad_motor) {
-            item.sector_automotor.capacidadMotor = item.sector_automotor.capacidad_motor;
-          }
-
-          if (item.sector_automotor.capacidad_pasajeros) {
-            item.sector_automotor.capacidadPasajeros = item.sector_automotor.capacidad_pasajeros;
-          }
-
-          if (item.sector_automotor.peso_bruto) {
-            item.sector_automotor.pesoBruto = item.sector_automotor.peso_bruto;
-          }
-
-          if (item.sector_automotor.peso_neto) {
-            item.sector_automotor.pesoNeto = item.sector_automotor.peso_neto;
-          }
-
-          if (item.sector_automotor.tipo_combustible) {
-            item.sector_automotor.tipoCombustible = item.sector_automotor.tipo_combustible;
-          }
-
-          if (item.sector_automotor.numero_motor) {
-            item.sector_automotor.numeroMotor = item.sector_automotor.numero_motor;
-          }
-
-          if (item.sector_automotor.capacidad_traccion) {
-            item.sector_automotor.capacidadTraccion = item.sector_automotor.capacidad_traccion;
-          }
-
-          if (item.sector_automotor.tipo_vehiculo) {
-            item.sector_automotor.tipoVehiculo = item.sector_automotor.tipo_vehiculo;
-          }
-        }
-      }
-    }
-
-    //Sector Energia
-    if (data.sector_energia_electrica) {
-      data.sectorEnergiaElectrica = { ...data.sector_energia_electrica };
-    }
-
-    if (data.sectorEnergiaElectrica?.numero_medidor) {
-      data.sectorEnergiaElectrica.numeroMedidor = data.sectorEnergiaElectrica.numero_medidor;
-    }
-
-    if (data.sectorEnergiaElectrica?.codigo_actividad) {
-      data.sectorEnergiaElectrica.codigoActividad = data.sectorEnergiaElectrica.codigo_actividad;
-    }
-
-    if (data.sectorEnergiaElectrica?.codigo_categoria) {
-      data.sectorEnergiaElectrica.codigoCategoria = data.sectorEnergiaElectrica.codigo_categoria;
-    }
-
-    if (data.sectorEnergiaElectrica?.lectura_anterior) {
-      data.sectorEnergiaElectrica.lecturaAnterior = data.sectorEnergiaElectrica.lectura_anterior;
-    }
-
-    if (data.sectorEnergiaElectrica?.lectura_actual) {
-      data.sectorEnergiaElectrica.lecturaActual = data.sectorEnergiaElectrica.lectura_actual;
-    }
-
-    //Sector Seguros
-    if (data.sector_seguros) {
-      data.sectorSeguros = { ...data.sector_seguros };
-    }
-
-    if (data.sectorSeguros?.codigo_aseguradora) {
-      data.sectorSeguros.codigoAseguradora = data.sectorSeguros.codigo_aseguradora;
-    }
-
-    if (data.sectorSeguros?.codigo_poliza) {
-      data.sectorSeguros.codigoPoliza = data.sectorSeguros.codigo_poliza;
-    }
-
-    if (data.sectorSeguros?.numero_poliza) {
-      data.sectorSeguros.numeroPoliza = data.sectorSeguros.numero_poliza;
-    }
-
-    if (data.sectorSeguros?.vigencia_unidad) {
-      data.sectorSeguros.vigenciaUnidad = data.sectorSeguros.vigencia_unidad;
-    }
-
-    if (data.sectorSeguros?.inicio_vigencia) {
-      data.sectorSeguros.inicioVigencia = data.sectorSeguros.inicio_vigencia;
-    }
-
-    if (data.sectorSeguros?.fin_vigencia) {
-      data.sectorSeguros.finVigencia = data.sectorSeguros.fin_vigencia;
-    }
-
-    if (data.sectorSeguros?.codigo_interno_item) {
-      data.sectorSeguros.codigoInternoItem = data.sectorSeguros.codigo_interno_item;
-    }
   }
 
   /**
@@ -501,38 +234,9 @@ class ReciboXmlMainService {
    * @param data
    */
   private addDefaultValues(data: any) {
-    if (constanteService.tiposDocumentos.filter((um) => um.codigo === data['tipoDocumento']).length == 0) {
-      //No quitar este throw
-      throw (
-        new Error("Tipo de Documento '" + data['tipoDocumento']) +
-        "' en data.tipoDocumento no válido. Valores: " +
-        constanteService.tiposDocumentos.map((a) => a.codigo + '-' + a.descripcion)
-      );
-    }
-    data['tipoDocumentoDescripcion'] = constanteService.tiposDocumentos.filter(
-      (td) => td.codigo == data['tipoDocumento'],
-    )[0]['descripcion'];
-
-    if (!data['tipoEmision']) {
-      data['tipoEmision'] = 1;
-    }
-
-    if (!data['tipoTransaccion']) {
-      data['tipoTransaccion'] = 1;
-    }
 
     if (!data['moneda']) {
       data['moneda'] = 'PYG';
-    }
-
-    //Valores por defecto para los items
-    if (data['items'] && data['items'].length > 0) {
-      for (let i = 0; i < data['items'].length; i++) {
-        const item = data['items'][i];
-        if (!item['unidadMedida']) {
-          item['unidadMedida'] = 77;
-        }
-      }
     }
   }
 
@@ -612,18 +316,7 @@ class ReciboXmlMainService {
 
     const codigoSeguridadAleatorio = this.codigoSeguridad;
 
-    if (constanteService.tiposEmisiones.filter((um) => um.codigo === data['tipoEmision']).length == 0) {
-      /*throw new Error(
-        "Tipo de Emisión '" +
-          data['tipoEmision'] +
-          "' en data.tipoEmision no válido. Valores: " +
-          constanteService.tiposEmisiones.map((a) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
     this.json['rDE']['recibo']['gOpeDE'] = {
-      iTipEmi: data['tipoEmision'],
-      dDesTipEmi: constanteService.tiposEmisiones.filter((td) => td.codigo == data['tipoEmision'])[0]['descripcion'],
       dCodSeg: codigoSeguridadAleatorio,
     };
 
@@ -635,31 +328,11 @@ class ReciboXmlMainService {
       this.json['rDE']['recibo']['gOpeDE']['dInfoFisc'] = data['descripcion'];
     }
 
-    //Validar aqui "dInfoFisc"
-    if (data['tipoDocumento'] == 7) {
-      //Nota de Remision
-      if (this.validateError) {
-        if (!(data['descripcion'] && data['descripcion'].length > 0)) {
-          //throw new Error('Debe informar la Descripción en data.descripcion para el Documento Electrónico');
-        }
-      }
-    }
   }
 
   /**
      * Genera los datos del timbrado
      * 
-     * <gTimb>
-			<iTiDE>1</iTiDE>
-			<dDesTiDE>Factura electrónica</dDesTiDE>
-			<dNumTim>12345678</dNumTim>
-			<dEst>001</dEst>
-			<dPunExp>001</dPunExp>
-			<dNumDoc>1000050</dNumDoc>
-			<dSerieNum>AB</dSerieNum>
-			<dFeIniT>2019-08-13</dFeIniT>
-		</gTimb>
-
      * @param params 
      * @param data 
      * @param options 
@@ -722,99 +395,28 @@ class ReciboXmlMainService {
      * @param options 
      */
   private generateDatosGeneralesInherentesOperacion(params: any, data: any, config: XmlgenConfig) {
-    if (data['tipoDocumento'] == 7) {
-      //C002
-      return; //No informa si el tipo de documento es 7
-    }
-
-    if (!data['tipoImpuesto']) {
-      //throw new Error('Debe especificar el Tipo de Impuesto en data.tipoImpuesto');
-    }
-
-    if (constanteService.tiposImpuestos.filter((um) => um.codigo === data['tipoImpuesto']).length == 0) {
-      /*throw new Error(
-        "Tipo de Impuesto '" +
-          data['tipoImpuesto'] +
-          "' en data.tipoImpuesto no válido. Valores: " +
-          constanteService.tiposImpuestos.map((a) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
 
     let moneda = data['moneda'];
     if (!moneda && config.defaultValues === true) {
       moneda = 'PYG';
     }
 
-    if (constanteService.monedas.filter((um) => um.codigo === moneda).length == 0) {
-      /*throw new Error(
-        "Moneda '" +
-          moneda +
-          "' en data.moneda no válido. Valores: " +
-          constanteService.monedas.map((a) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-    if (data['condicionAnticipo']) {
-      if (constanteService.globalPorItem.filter((um) => um.codigo === data['condicionAnticipo']).length == 0) {
-        /*throw new Error(
-          "Condición de Anticipo '" +
-            data['condicionAnticipo'] +
-            "' en data.condicionAnticipo no válido. Valores: " +
-            constanteService.globalPorItem.map((a) => a.codigo + '-Anticipo ' + a.descripcion),
-        );*/
-      }
-    }
-    if (constanteService.tiposTransacciones.filter((um) => um.codigo === data['tipoTransaccion']).length == 0) {
-      /*throw new Error(
-        "Tipo de Transacción '" +
-          data['tipoTransaccion'] +
-          "' en data.tipoTransaccion no válido. Valores: " +
-          constanteService.tiposTransacciones.map((a) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
     this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom'] = {};
 
-    if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
-      //Obligatorio informar iTipTra D011
-      if (!data['tipoTransaccion']) {
-        //throw new Error('Debe proveer el Tipo de Transacción en data.tipoTransaccion');
-      }
-      this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['iTipTra'] = data['tipoTransaccion'];
-      this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dDesTipTra'] = constanteService.tiposTransacciones.filter(
-        (tt) => tt.codigo == data['tipoTransaccion'],
-      )[0]['descripcion'];
-    }
-
-    this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['iTImp'] = data['tipoImpuesto']; //D013
-    this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dDesTImp'] = constanteService.tiposImpuestos.filter(
-      (ti) => ti.codigo == data['tipoImpuesto'],
-    )[0]['descripcion']; //D013
     this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['cMoneOpe'] = moneda; //D015
     this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dDesMoneOpe'] = constanteService.monedas.filter(
       (m) => m.codigo == moneda,
     )[0]['descripcion'];
 
     if (moneda != 'PYG') {
-      if (!data['condicionTipoCambio']) {
-        //throw new Error('Debe informar el tipo de Cambio en data.condicionTipoCambio');
-      }
       //Obligatorio informar dCondTiCam D017
       this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dCondTiCam'] = data['condicionTipoCambio'];
     }
     if (data['condicionTipoCambio'] == 1 && moneda != 'PYG') {
-      if (!(data['cambio'] && data['cambio'] > 0)) {
-        //throw new Error('Debe informar el valor del Cambio en data.cambio');
-      }
       //Obligatorio informar dCondTiCam D018
       this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dTiCam'] = data['cambio'];
     }
 
-    if (data['condicionAnticipo']) {
-      this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['iCondAnt'] = data['condicionAnticipo'];
-      this.json['rDE']['recibo']['gDatGralOpe']['gOpeCom']['dDesCondAnt'] =
-        'Anticipo ' +
-        constanteService.globalPorItem.filter((ca) => ca.codigo == data['condicionAnticipo'])[0]['descripcion'];
-    }
   }
 
   /**
@@ -832,19 +434,8 @@ class ReciboXmlMainService {
 
     //Validar si el establecimiento viene en params
     let establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
-    //let punto = stringUtilService.leftZero(data['punto'], 3);
 
-    if (params.establecimientos.filter((um: any) => um.codigo === establecimiento).length == 0) {
-      /*throw new Error(
-        "Establecimiento '" +
-          establecimiento +
-          "' no encontrado en params.establecimientos*.codigo. Valores: " +
-          params.establecimientos.map((a: any) => a.codigo + '-' + a.denominacion),
-      );*/
-    }
-    if (params['ruc'].indexOf('-') == -1) {
-      //throw new Error('RUC debe contener dígito verificador en params.ruc');
-    }
+
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis'] = {
       dRucEm: params['ruc'].split('-')[0],
       dDVEmi: params['ruc'].split('-')[1],
@@ -902,18 +493,7 @@ class ReciboXmlMainService {
    * @param options
    */
   private generateDatosGeneralesResponsableGeneracionDE(params: any, data: any) {
-    if (
-      constanteService.tiposDocumentosIdentidades.filter((um: any) => um.codigo === data['usuario']['documentoTipo'])
-        .length == 0
-    ) {
-      /*throw new Error(
-        "Tipo de Documento '" +
-          data['usuario']['documentoTipo'] +
-          "' no encontrado en data.usuario.documentoTipo. Valores: " +
-          constanteService.tiposDocumentosIdentidades.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
+    
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis']['gRespDE'] = {
       iTipIDRespDE: data['usuario']['documentoTipo'],
       dDTipIDRespDE: constanteService.tiposDocumentosIdentidades.filter(
@@ -921,19 +501,6 @@ class ReciboXmlMainService {
       )[0]['descripcion'],
     };
 
-    if (this.validateError) {
-      if (!data['usuario']['documentoNumero']) {
-        //throw new Error('El Documento del responsable en data.usuario.documentoNumero no puede ser vacio');
-      }
-
-      if (!data['usuario']['nombre']) {
-        //throw new Error('El Nombre del responsable en data.usuario.nombre no puede ser vacio');
-      }
-
-      if (!data['usuario']['cargo']) {
-        //throw new Error('El Cargo del responsable en data.usuario.cargo no puede ser vacio');
-      }
-    }
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis']['gRespDE']['dNumIDRespDE'] = data['usuario']['documentoNumero'];
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis']['gRespDE']['dNomRespDE'] = data['usuario']['nombre'];
     this.json['rDE']['recibo']['gDatGralOpe']['gEmis']['gRespDE']['dCarRespDE'] = data['usuario']['cargo'];
@@ -943,83 +510,14 @@ class ReciboXmlMainService {
      * Datos generales del receptor del documento electrónico
      * Pertenece al grupo de datos generales
      * 
-     * <gDatRec>
-                <iNatRec>1</iNatRec>
-                <iTiOpe>1</iTiOpe>
-                <cPaisRec>PRY</cPaisRec>
-                <dDesPaisRe>Paraguay</dDesPaisRe>
-                <iTiContRec>2</iTiContRec>
-                <dRucRec>00000002</dRucRec>
-                <dDVRec>7</dDVRec>
-                <dNomRec>RECEPTOR DEL DOCUMENTO</dNomRec>
-                <dDirRec>CALLE 1 ENTRE CALLE 2 Y CALLE 3</dDirRec>
-                <dNumCasRec>123</dNumCasRec>
-                <cDepRec>1</cDepRec>
-                <dDesDepRec>CAPITAL</dDesDepRec>
-                <cDisRec>1</cDisRec>
-                <dDesDisRec>ASUNCION (DISTRITO)</dDesDisRec>
-                <cCiuRec>1</cCiuRec>
-                <dDesCiuRec>ASUNCION (DISTRITO)</dDesCiuRec>
-                <dTelRec>012123456</dTelRec>
-                <dCodCliente>AAA</dCodCliente>
-            </gDatRec>
      * 
      * @param params 
      * @param data 
      * @param options 
      */
   private generateDatosGeneralesReceptorDE(params: any, data: any) {
-    if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
-      if (
-        constanteService.tiposDocumentosReceptor.filter((um: any) => um.codigo === data['cliente']['documentoTipo'])
-          .length == 0
-      ) {
-        /*throw new Error(
-          "Tipo de Documento '" +
-            data['cliente']['documentoTipo'] +
-            "' del Cliente en data.cliente.documentoTipo no encontrado. Valores: " +
-            constanteService.tiposDocumentosReceptor.map((a: any) => a.codigo + '-' + a.descripcion),
-        );*/
-      }
-    }
 
     var regExpOnlyNumber = new RegExp(/^\d+$/);
-    if (data['cliente']['contribuyente']) {
-      if (this.validateError) {
-        if (!data['cliente']['ruc']) {
-          //throw new Error('Debe proporcionar el RUC en data.cliente.ruc');
-        }
-        if (data['cliente']['ruc'].indexOf('-') == -1) {
-          //throw new Error('RUC debe contener dígito verificador en data.cliente.ruc');
-        }
-
-        const rucCliente = data['cliente']['ruc'].split('-');
-
-        if (!regExpOnlyNumber.test((rucCliente[0] + '').trim())) {
-          //throw new Error("El RUC del Cliente '" + rucCliente[0] + "' en data.cliente.ruc debe ser numérico");
-        }
-        if (!regExpOnlyNumber.test((rucCliente[1] + '').trim())) {
-          //throw new Error("El DV del RUC del Cliente '" + rucCliente[1] + "' en data.cliente.ruc debe ser numérico");
-        }
-      }
-    }
-
-    if (constanteService.paises.filter((pais: any) => pais.codigo === data['cliente']['pais']).length == 0) {
-      /*throw new Error(
-        "Pais '" +
-          data['cliente']['pais'] +
-          "' del Cliente en data.cliente.pais no encontrado. Valores: " +
-          constanteService.paises.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    if (data['tipoDocumento'] == 4) {
-      if (this.validateError) {
-        if (data['cliente']['tipoOperacion'] != 2) {
-          //throw new Error('El Tipo de Operación debe ser 2-B2C para el Tipo de Documento AutoFactura');
-        }
-      }
-    }
 
     this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'] = {
       iNatRec: data['cliente']['contribuyente'] ? 1 : 2,
@@ -1037,14 +535,8 @@ class ReciboXmlMainService {
       //Obligatorio completar D210
 
       if (this.validateError) {
-        if (data['cliente']['tipoOperacion'] != 4 && !data['cliente']['documentoNumero']) {
-          //throw new Error('Debe informar el número de documento en data.cliente.documentoNumero');
-        }
 
         if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
-          if (!data['cliente']['documentoTipo']) {
-            //throw new Error('Debe informar el Tipo de Documento del Cliente en data.cliente.documentoTipo');
-          }
 
           this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['iTipIDRec'] = data['cliente']['documentoTipo'];
 
@@ -1065,58 +557,21 @@ class ReciboXmlMainService {
 
     this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dNomRec'] = data['cliente']['razonSocial'].trim();
 
-    if (+data['cliente']['documentoTipo'] === 5) {
-      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dNomRec'] = 'Sin Nombre';
-    }
-
     //if (data['cliente']['documentoTipo'] === 5) {
     if (data['cliente']['nombreFantasia']) {
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dNomFanRec'] = data['cliente']['nombreFantasia'].trim();
     }
     //}
 
-    if (data['tipoDocumento'] === 7 || data['cliente']['tipoOperacion'] === 4) {
-      if (!data['cliente']['direccion']) {
-        //throw new Error('data.cliente.direccion es Obligatorio para Tipo de Documento 7 o Tipo de Operación 4');
-      }
-    }
-
     if (data['cliente']['direccion']) {
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDirRec'] = data['cliente']['direccion'].trim();
-
-      //Si tiene dirección hay que completar numero de casa.
-      if (!data['cliente']['numeroCasa']) {
-        //throw new Error('Debe informar el Número de casa del Receptor en data.cliente.numeroCasa');
-      }
     }
 
     if (data['cliente']['numeroCasa']) {
-      if (!regExpOnlyNumber.test(data['cliente']['numeroCasa'])) {
-        //throw new Error('El Número de Casa en data.cliente.numeroCasa debe ser numérico');
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dNumCasRec'] = (data['cliente']['numeroCasa'] + '').trim();
     }
 
     if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
-      if (this.validateError) {
-        if (!data['cliente']['departamento']) {
-          /*throw new Error(
-            'Obligatorio especificar el Departamento en data.cliente.departamento para Tipo de Documento != 4',
-          );*/
-        }
-        if (
-          constanteService.departamentos.filter(
-            (departamento: any) => departamento.codigo === +data['cliente']['departamento'],
-          ).length == 0
-        ) {
-          /*throw new Error(
-            "Departamento '" +
-              data['cliente']['departamento'] +
-              "' del Cliente en data.cliente.departamento no encontrado. Valores: " +
-              constanteService.departamentos.map((a: any) => a.codigo + '-' + a.descripcion),
-          );*/
-        }
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cDepRec'] = +data['cliente']['departamento'];
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesDepRec'] = constanteService.departamentos.filter(
         (td) => td.codigo === +data['cliente']['departamento'],
@@ -1124,87 +579,21 @@ class ReciboXmlMainService {
     }
 
     if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
-      if (this.validateError) {
-        if (!data['cliente']['distrito']) {
-          //throw new Error('Obligatorio especificar el Distrito en data.cliente.distrito para Tipo de Documento != 4');
-        }
-
-        if (
-          constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito'])
-            .length == 0
-        ) {
-          /*throw new Error(
-            "Distrito '" +
-              data['cliente']['distrito'] +
-              "' del Cliente en data.cliente.distrito no encontrado. Valores: " +
-              constanteService.distritos.map((a: any) => a.codigo + '-' + a.descripcion),
-          );*/
-        }
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cDisRec'] = +data['cliente']['distrito'];
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesDisRec'] = constanteService.distritos.filter(
         (td) => td.codigo === +data['cliente']['distrito'],
       )[0]['descripcion'];
     }
     if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
-      if (this.validateError) {
-        if (!data['cliente']['ciudad']) {
-          //throw new Error('Obligatorio especificar la Ciudad en data.cliente.ciudad para Tipo de Documento != 4');
-        }
-        if (
-          constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0
-        ) {
-          /*throw new Error(
-            "Ciudad '" +
-              data['cliente']['ciudad'] +
-              "' del Cliente en data.cliente.ciudad no encontrado. Valores: " +
-              constanteService.ciudades.map((a: any) => a.codigo + '-' + a.descripcion),
-          );*/
-        }
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cCiuRec'] = +data['cliente']['ciudad'];
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesCiuRec'] = constanteService.ciudades.filter(
         (td) => td.codigo === +data['cliente']['ciudad'],
       )[0]['descripcion'];
     }
-
-    /*
-    constanteService.validateDepartamentoDistritoCiudad(
-      'data.cliente',
-      +data['cliente']['departamento'],
-      +data['cliente']['distrito'],
-      +data['cliente']['ciudad'], this.errors
-    );
-    */
-
-    //Asignar null a departamento, distrito y ciudad si tipoOperacion = 4
-    /*    if (data['cliente']['tipoOperacion'] === 4) {
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cDepRec'] = null;
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesDepRec'] = null;
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cDisRec'] = null;
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesDisRec'] = null;
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['cCiuRec'] = null;
-            this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dDesCiuRec'] = null;
-        }
-    */
     if (data['cliente']['telefono']) {
-      if (!(data['cliente']['telefono'].length >= 6 && data['cliente']['telefono'].length <= 15)) {
-        /*throw new Error(
-          "El valor '" +
-            data['cliente']['telefono'] +
-            "' en data.cliente.telefono debe tener una longitud de 6 a 15 caracteres",
-        );*/
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dTelRec = data['cliente']['telefono'].trim();
     }
     if (data['cliente']['celular']) {
-      if (!(data['cliente']['celular'].length >= 10 && data['cliente']['celular'].length <= 20)) {
-        /*throw new Error(
-          "El valor '" +
-            data['cliente']['celular'] +
-            "' en data.cliente.celular debe tener una longitud de 10 a 20 caracteres",
-        );*/
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dCelRec = data['cliente']['celular'].trim();
     }
     if (data['cliente']['email']) {
@@ -1228,344 +617,7 @@ class ReciboXmlMainService {
     }
 
     if (data['cliente']['codigo']) {
-      if (this.validateError) {
-        if (!((data['cliente']['codigo'] + '').length >= 3)) {
-          /*throw new Error(
-            "El código del Cliente '" +
-              data['cliente']['codigo'] +
-              "' en data.cliente.codigo debe tener al menos 3 caracteres",
-          );*/
-        }
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec']['dCodCliente'] = (data['cliente']['codigo'] + '').trim();
-    }
-  }
-
-  /**
-   * Campos que seran especificos de acuerdo a cada tipo de documento electronico
-   * Se dividiran en diferentes métodos por cada tipo de factura.
-   *
-   * @param params
-   * @param data
-   * @param options
-   */
-  private generateDatosEspecificosPorTipoDE(params: any, data: any, config: XmlgenConfig) {
-    this.json['rDE']['recibo']['gDtipDE'] = {};
-
-    if (data['tipoDocumento'] === 1) {
-      this.generateDatosEspecificosPorTipoDE_FacturaElectronica(params, data, config);
-    }
-    if (data['tipoDocumento'] === 4) {
-      this.generateDatosEspecificosPorTipoDE_Autofactura(params, data);
-    }
-
-    if (data['tipoDocumento'] === 5 || data['tipoDocumento'] === 6) {
-      this.generateDatosEspecificosPorTipoDE_NotaCreditoDebito(params, data);
-    }
-
-    if (data['tipoDocumento'] === 7) {
-      this.generateDatosEspecificosPorTipoDE_RemisionElectronica(params, data);
-    }
-  }
-
-  /**
-   * Datos especificos para la factura electronica
-   *
-   * @param params
-   * @param data
-   * @param options
-   */
-  private generateDatosEspecificosPorTipoDE_FacturaElectronica(params: any, data: any, config: XmlgenConfig) {
-    if (
-      constanteService.indicadoresPresencias.filter((um: any) => um.codigo === data['factura']['presencia']).length == 0
-    ) {
-      /*throw new Error(
-        "Indicador de Presencia '" +
-          data['factura']['presencia'] +
-          "' en data.factura.presencia no encontrado. Valores: " +
-          constanteService.indicadoresPresencias.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    this.json['rDE']['recibo']['gDtipDE']['gCamFE'] = {
-      iIndPres: data['factura']['presencia'],
-      dDesIndPres: constanteService.indicadoresPresencias.filter((ip) => ip.codigo === data['factura']['presencia'])[0][
-        'descripcion'
-      ],
-      //dFecEmNR : data['factura']['fechaEnvio']
-    };
-
-    if (data['factura']['fechaEnvio']) {
-      let fechaFactura = new Date(data['fecha']);
-      let fechaEnvio = new Date(data['factura']['fechaEnvio']);
-
-      if (fechaFactura.getTime() > fechaEnvio.getTime()) {
-        /*throw new Error(
-          "La Fecha de envío '" +
-            data['factura']['fechaEnvio'] +
-            "'en data.factura.fechaEnvio, debe ser despues de la fecha de Factura",
-        );*/
-      }
-      this.json['rDE']['recibo']['gDtipDE']['gCamFE']['dFecEmNR'] = data['factura']['fechaEnvio'];
-    }
-    if (data['cliente']['tipoOperacion'] === 3) {
-      this.generateDatosEspecificosPorTipoDE_ComprasPublicas(params, data);
-    }
-  }
-
-  /**
-   * Datos especificos cuando el tipo de operacion del receptor es B2G (Campo D202)
-   * Dentro de la factura electronica
-   *
-   * @param params
-   * @param data
-   * @param options
-   */
-  private generateDatosEspecificosPorTipoDE_ComprasPublicas(params: any, data: any) {
-    if (!(data['dncp'] && data['dncp']['modalidad'] && data['dncp']['modalidad'].length > 0)) {
-      //throw new Error('Debe informar la modalidad de Contratación DNCP en data.dncp.modalidad');
-    }
-    if (!(data['dncp'] && data['dncp']['entidad'] && data['dncp']['entidad'].length > 0)) {
-      //throw new Error('Debe informar la entidad de Contratación DNCP en data.dncp.entidad');
-    }
-    if (!(data['dncp'] && data['dncp']['año'] && data['dncp']['año'].length > 0)) {
-      //throw new Error('Debe informar la año de Contratación DNCP en data.dncp.año');
-    }
-    if (!(data['dncp'] && data['dncp']['secuencia'] && data['dncp']['secuencia'].length > 0)) {
-      //throw new Error('Debe informar la secuencia de Contratación DNCP en data.dncp.secuencia');
-    }
-    if (!(data['dncp'] && data['dncp']['fecha'] && data['dncp']['fecha'].length > 0)) {
-      //throw new Error('Debe informar la fecha de emisión de código de Contratación DNCP en data.dncp.fecha');
-    }
-
-    this.json['rDE']['recibo']['gDtipDE']['gCamFE']['gCompPub'] = {
-      dModCont: data['dncp']['modalidad'],
-      dEntCont: data['dncp']['entidad'],
-      dAnoCont: data['dncp']['año'],
-      dSecCont: data['dncp']['secuencia'],
-      dFeCodCont: data['dncp']['fecha'],
-    };
-  }
-
-  private generateDatosEspecificosPorTipoDE_Autofactura(params: any, data: any) {
-    if (this.validateError) {
-      if (!data['autoFactura']) {
-        //throw new Error('Para tipoDocumento = 4 debe proveer los datos de Autofactura en data.autoFactura');
-      }
-      if (!data['autoFactura']['ubicacion']) {
-        /*throw new Error(
-          'Para tipoDocumento = 4 debe proveer los datos del Lugar de Transacción de la Autofactura en data.autoFactura.ubicacion',
-        );*/
-      }
-
-      if (!data['autoFactura']['tipoVendedor']) {
-        //throw new Error('Debe especificar la Naturaleza del Vendedor en data.autoFactura.tipoVendedor');
-      }
-
-      if (!data['autoFactura']['documentoTipo']) {
-        //throw new Error('Debe especificar el Tipo de Documento del Vendedor en data.autoFactura.documentoTipo');
-      }
-    }
-
-    if (
-      constanteService.naturalezaVendedorAutofactura.filter(
-        (um: any) => um.codigo === data['autoFactura']['tipoVendedor'],
-      ).length == 0
-    ) {
-      /*throw new Error(
-        "Tipo de Vendedor '" +
-          data['autoFactura']['tipoVendedor'] +
-          "' en data.autoFactura.tipoVendedor no encontrado. Valores: " +
-          constanteService.naturalezaVendedorAutofactura.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    if (
-      constanteService.tiposDocumentosIdentidades.filter(
-        (um: any) => um.codigo === data['autoFactura']['documentoTipo'],
-      ).length == 0
-    ) {
-      /*throw new Error(
-        "Tipo de Documento '" +
-          data['autoFactura']['documentoTipo'] +
-          "' en data.autoFactura.documentoTipo no encontrado. Valores: " +
-          constanteService.tiposDocumentosIdentidades.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    if (this.validateError) {
-      if (!data['autoFactura']['ubicacion']) {
-        //throw new Error('Debe especificar la ubicación de la transacción en data.autoFactura.ubicacion');
-      }
-
-      if (!data['autoFactura']['documentoNumero']) {
-        //throw new Error('Debe especificar el Nro. de Documento del Vendedor en data.autoFactura.documentoNumero');
-      }
-      if (!data['autoFactura']['nombre']) {
-        //throw new Error('Debe especificar el Nombre del Vendedor en data.autoFactura.nombre');
-      }
-      if (!data['autoFactura']['direccion']) {
-        //throw new Error('Debe especificar la Dirección del Vendedor en data.autoFactura.direccion');
-      }
-      if (!data['autoFactura']['numeroCasa']) {
-        //throw new Error('Debe especificar el Número de Casa del Vendedor en data.autoFactura.numeroCasa');
-      }
-
-      if (!data['autoFactura']['departamento']) {
-        //throw new Error('Debe especificar el Departamento del Vendedor en data.autoFactura.departamento');
-      }
-      if (!data['autoFactura']['distrito']) {
-        //throw new Error('Debe especificar el Distrito Vendedor en data.autoFactura.distrito');
-      }
-      if (!data['autoFactura']['ciudad']) {
-        //throw new Error('Debe especificar la Ciudad del Vendedor en data.autoFactura.ciudad');
-      }
-
-      if (!data['autoFactura']['ubicacion']['departamento']) {
-        /*throw new Error(
-          'Debe especificar el Departamento del Lugar de la Transacción en data.autoFactura.ubicacion.departamento',
-        );*/
-      }
-      if (!data['autoFactura']['ubicacion']['distrito']) {
-        /*throw new Error(
-          'Debe especificar el Distrito del Lugar de la Transacciónen data.autoFactura.ubicacion.distrito',
-        );*/
-      }
-      if (!data['autoFactura']['ubicacion']['ciudad']) {
-        //throw new Error('Debe especificar la Ciudad del Lugar de la Transacción en data.autoFactura.ubicacion.ciudad');
-      }
-    }
-
-    this.json['rDE']['recibo']['gDtipDE']['gCamAE'] = {
-      iNatVen: data['autoFactura']['tipoVendedor'], //1=No contribuyente, 2=Extranjero
-      dDesNatVen: constanteService.naturalezaVendedorAutofactura.filter(
-        (nv) => nv.codigo === data['autoFactura']['tipoVendedor'],
-      )[0]['descripcion'],
-      iTipIDVen: data['autoFactura']['documentoTipo'],
-      dDTipIDVen: constanteService.tiposDocumentosIdentidades.filter(
-        (td) => td.codigo === data['autoFactura']['documentoTipo'],
-      )[0]['descripcion'],
-      dNumIDVen: data['autoFactura']['documentoNumero'],
-      dNomVen: data['autoFactura']['nombre'],
-      dDirVen: data['autoFactura']['direccion'],
-      dNumCasVen: data['autoFactura']['numeroCasa'],
-
-      cDepVen: +data['autoFactura']['departamento'],
-      dDesDepVen: constanteService.departamentos.filter((td) => td.codigo === +data['autoFactura']['departamento'])[0][
-        'descripcion'
-      ],
-      cDisVen: +data['autoFactura']['distrito'],
-      dDesDisVen: constanteService.distritos.filter((td) => td.codigo === +data['autoFactura']['distrito'])[0][
-        'descripcion'
-      ],
-      cCiuVen: +data['autoFactura']['ciudad'],
-      dDesCiuVen: constanteService.ciudades.filter((td) => td.codigo === +data['autoFactura']['ciudad'])[0][
-        'descripcion'
-      ],
-      dDirProv: data['autoFactura']['ubicacion']['lugar'],
-      cDepProv: +data['autoFactura']['ubicacion']['departamento'],
-      dDesDepProv: constanteService.departamentos.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['departamento'],
-      )[0]['descripcion'],
-      cDisProv: +data['autoFactura']['ubicacion']['distrito'],
-      dDesDisProv: constanteService.distritos.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['distrito'],
-      )[0]['descripcion'],
-      cCiuProv: +data['autoFactura']['ubicacion']['ciudad'],
-      dDesCiuProv: constanteService.ciudades.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['ciudad'],
-      )[0]['descripcion'],
-    };
-
-    /*
-    constanteService.validateDepartamentoDistritoCiudad(
-      'data.autoFactura',
-      +data['autoFactura']['departamento'],
-      +data['autoFactura']['distrito'],
-      +data['autoFactura']['ciudad'],
-    );
-    constanteService.validateDepartamentoDistritoCiudad(
-      'data.autoFactura.ubicacion',
-      +data['autoFactura']['ubicacion']['departamento'],
-      +data['autoFactura']['ubicacion']['distrito'],
-      +data['autoFactura']['ubicacion']['ciudad'],
-    );
-    */
-  }
-
-  private generateDatosEspecificosPorTipoDE_NotaCreditoDebito(params: any, data: any) {
-    if (this.validateError) {
-      if (!data['notaCreditoDebito']['motivo']) {
-        //throw new Error('Debe completar el motivo para la nota de crédito/débito en data.notaCreditoDebito.motivo');
-      }
-    }
-    if (
-      constanteService.notasCreditosMotivos.filter((um: any) => um.codigo === data['notaCreditoDebito']['motivo'])
-        .length == 0
-    ) {
-      /*throw new Error(
-        "Motivo de la Nota de Crédito/Débito '" +
-          data['notaCreditoDebito']['motivo'] +
-          "' en data.notaCreditoDebito.motivo no encontrado. Valores: " +
-          constanteService.notasCreditosMotivos.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    this.json['rDE']['recibo']['gDtipDE']['gCamNCDE'] = {
-      iMotEmi: data['notaCreditoDebito']['motivo'],
-      dDesMotEmi: constanteService.notasCreditosMotivos.filter(
-        (nv) => nv.codigo === data['notaCreditoDebito']['motivo'],
-      )[0]['descripcion'],
-    };
-  }
-
-  private generateDatosEspecificosPorTipoDE_RemisionElectronica(params: any, data: any) {
-    if (this.validateError) {
-      if (!(data['remision'] && data['remision']['motivo'])) {
-        //throw new Error('No fue pasado el Motivo de la Remisión en data.remision.motivo.');
-      }
-      if (!(data['remision'] && data['remision']['tipoResponsable'])) {
-        //throw new Error('No fue pasado el Tipo de Responsable de la Remisión en data.remision.tipoResponsable.');
-      }
-    }
-    if (constanteService.remisionesMotivos.filter((um: any) => um.codigo === data['remision']['motivo']).length == 0) {
-      /*throw new Error(
-        "Motivo de la Remisión '" +
-          data['remision']['motivo'] +
-          "' en data.remision.motivo no encontrado. Valores: " +
-          constanteService.remisionesMotivos.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-    if (
-      constanteService.remisionesResponsables.filter((um: any) => um.codigo === data['remision']['tipoResponsable'])
-        .length == 0
-    ) {
-      /*throw new Error(
-        "Tipo de Responsable '" +
-          data['remision']['tipoResponsable'] +
-          "' en data.remision.tipoResponsable no encontrado. Valores: " +
-          constanteService.remisionesResponsables.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
-
-    this.json['rDE']['recibo']['gDtipDE']['gCamNRE'] = {
-      iMotEmiNR: data['remision']['motivo'], //E501
-      dDesMotEmiNR: constanteService.remisionesMotivos.filter((nv) => nv.codigo === data['remision']['motivo'])[0][
-        'descripcion'
-      ],
-      iRespEmiNR: data['remision']['tipoResponsable'],
-      dDesRespEmiNR: constanteService.remisionesResponsables.filter(
-        (nv) => nv.codigo === data['remision']['tipoResponsable'],
-      )[0]['descripcion'],
-      //dKmR: data['remision']['kms'],
-      //dFecEm: data['remision']['fechaFactura'],
-    };
-
-    if (data['remision']['kms']) {
-      this.json['rDE']['recibo']['gDtipDE']['gCamNRE']['dKmR'] = data['remision']['kms'];
-    }
-    if (data['remision']['fechaFactura']) {
-      this.json['rDE']['recibo']['gDtipDE']['gCamNRE']['dFecEm'] = data['remision']['fechaFactura'];
     }
   }
 
@@ -1883,33 +935,6 @@ class ReciboXmlMainService {
     return xml;
   }
 
-  getDepartamentos() {
-    return constanteService.departamentos;
-  }
-
-  getDistritos(departamento: number) {
-    return constanteService.distritos.filter((dis) => dis.departamento === departamento);
-  }
-
-  getCiudades(distrito: number) {
-    return constanteService.ciudades.filter((ciu) => ciu.distrito === distrito);
-  }
-
-  getTiposRegimenes() {
-    return constanteService.tiposRegimenes;
-  }
-
-  getDepartamento(departamentoId: number) {
-    return constanteService.departamentos.filter((dis) => dis.codigo === departamentoId);
-  }
-
-  getDistrito(distritoId: number) {
-    return constanteService.distritos.filter((dis) => dis.codigo === distritoId);
-  }
-
-  getCiudad(ciudadId: number) {
-    return constanteService.ciudades.filter((ciu) => ciu.codigo === ciudadId);
-  }
 }
 
 export default new ReciboXmlMainService();

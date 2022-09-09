@@ -3,7 +3,7 @@ import fechaUtilService from './FechaUtil.service';
 import constanteService from './constante.service';
 import { XmlgenConfig } from './type.interface.';
 
-class JSonDeMainValidateService {
+class JSonReciboValidateService {
   errors: Array<string>;
 
   constructor() {
@@ -15,12 +15,6 @@ class JSonDeMainValidateService {
    */
   public validateValues(params: any, data: any, config: XmlgenConfig) {
     this.errors = new Array<string>();
-
-    if (constanteService.tiposDocumentos.filter((um) => um.codigo === data['tipoDocumento']).length == 0) {
-      this.errors.push("Tipo de Documento '" + data['tipoDocumento']) +
-        "' en data.tipoDocumento no válido. Valores: " +
-        constanteService.tiposDocumentos.map((a) => a.codigo + '-' + a.descripcion);
-    }
 
     if (typeof data['cliente'] == 'undefined') {
       this.errors.push('Debe especificar los datos del Cliente en data.cliente');
@@ -52,8 +46,6 @@ class JSonDeMainValidateService {
 
     this.generateDatosGeneralesValidate(params, data);
 
-    this.generateDatosEspecificosPorTipoDEValidate(params, data);
-
     this.generateDatosCondicionOperacionDEValidate(params, data);
 
     this.generateDatosTotalesValidate(params, data);
@@ -66,13 +58,13 @@ class JSonDeMainValidateService {
       }
     }
 
-    if (!data['documentoAsociados']) {
+    if (! (data['documentosAsociados'] && Array.isArray(data['documentosAsociados']))) {
       this.errors.push(
-        'Datos de/los Documento/s asociado/s es/son obligatorio/s',
+        'Dato/s de/los Documento/s asociado/s es/son obligatorio/s en data.documentosAsociados',
       );
     }
 
-    this.generateDatosDocumentoAsociadoValidate(params, data);
+    this.generateDatosDocumentosAsociadosValidate(params, data);
 
     //Tratamiento Final, del Envio del Error, no tocar
     if (this.errors.length > 0) {
@@ -211,15 +203,6 @@ class JSonDeMainValidateService {
       this.errors.push('RUC debe contener dígito verificador en params.ruc');
     }
 
-    if (constanteService.tiposEmisiones.filter((um) => um.codigo === data['tipoEmision']).length == 0) {
-      this.errors.push(
-        "Tipo de Emisión '" +
-          data['tipoEmision'] +
-          "' en data.tipoEmision no válido. Valores: " +
-          constanteService.tiposEmisiones.map((a) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
     //Validar aqui "dInfoFisc"
     if (data['tipoDocumento'] == 7) {
       //Nota de Remision
@@ -251,19 +234,6 @@ class JSonDeMainValidateService {
       );
     }
 
-    if (!data['tipoImpuesto']) {
-      this.errors.push('Debe especificar el Tipo de Impuesto en data.tipoImpuesto');
-    } else {
-      if (constanteService.tiposImpuestos.filter((um) => um.codigo === data['tipoImpuesto']).length == 0) {
-        this.errors.push(
-          "Tipo de Impuesto '" +
-            data['tipoImpuesto'] +
-            "' en data.tipoImpuesto no válido. Valores: " +
-            constanteService.tiposImpuestos.map((a) => a.codigo + '-' + a.descripcion),
-        );
-      }
-    }
-
     let moneda = data['moneda'];
     if (!moneda && defaultValues === true) {
       moneda = 'PYG';
@@ -287,15 +257,6 @@ class JSonDeMainValidateService {
             constanteService.globalPorItem.map((a) => a.codigo + '-Anticipo ' + a.descripcion),
         );
       }
-    }
-
-    if (constanteService.tiposTransacciones.filter((um) => um.codigo === data['tipoTransaccion']).length == 0) {
-      this.errors.push(
-        "Tipo de Transacción '" +
-          data['tipoTransaccion'] +
-          "' en data.tipoTransaccion no válido. Valores: " +
-          constanteService.tiposTransacciones.map((a) => a.codigo + '-' + a.descripcion),
-      );
     }
 
     if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
@@ -601,241 +562,6 @@ class JSonDeMainValidateService {
     }
   }
 
-  private generateDatosEspecificosPorTipoDEValidate(params: any, data: any) {
-    if (data['tipoDocumento'] === 1) {
-      this.generateDatosEspecificosPorTipoDE_FacturaElectronicaValidate(params, data);
-    }
-    if (data['tipoDocumento'] === 4) {
-      this.generateDatosEspecificosPorTipoDE_AutofacturaValidate(params, data);
-    }
-
-    if (data['tipoDocumento'] === 5 || data['tipoDocumento'] === 6) {
-      this.generateDatosEspecificosPorTipoDE_NotaCreditoDebitoValidate(params, data);
-    }
-
-    if (data['tipoDocumento'] === 7) {
-      this.generateDatosEspecificosPorTipoDE_RemisionElectronicaValidate(params, data);
-    }
-  }
-
-  private generateDatosEspecificosPorTipoDE_FacturaElectronicaValidate(params: any, data: any) {
-    if (!data['factura']) {
-      this.errors.push('Debe indicar los datos especificos de la Factura en data.factura');
-      return; // Termina el metodos
-    }
-
-    if (
-      constanteService.indicadoresPresencias.filter((um: any) => um.codigo === data['factura']['presencia']).length == 0
-    ) {
-      this.errors.push(
-        "Indicador de Presencia '" +
-          data['factura']['presencia'] +
-          "' en data.factura.presencia no encontrado. Valores: " +
-          constanteService.indicadoresPresencias.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
-    if (data['factura']['fechaEnvio']) {
-      let fechaFactura = new Date(data['fecha']);
-      let fechaEnvio = new Date(data['factura']['fechaEnvio']);
-
-      if (fechaFactura.getTime() > fechaEnvio.getTime()) {
-        this.errors.push(
-          "La Fecha de envío '" +
-            data['factura']['fechaEnvio'] +
-            "'en data.factura.fechaEnvio, debe ser despues de la fecha de Factura",
-        );
-      }
-    }
-
-    if (data['cliente']['tipoOperacion'] === 3) {
-      this.generateDatosEspecificosPorTipoDE_ComprasPublicasValidate(params, data);
-    }
-  }
-
-  /**
-   * Datos especificos cuando el tipo de operacion del receptor es B2G (Campo D202)
-   * Dentro de la factura electronica
-   *
-   * @param params
-   * @param data
-   * @param options
-   */
-  private generateDatosEspecificosPorTipoDE_ComprasPublicasValidate(params: any, data: any) {
-    if (!(data['dncp'] && data['dncp']['modalidad'] && data['dncp']['modalidad'].length > 0)) {
-      this.errors.push('Debe informar la modalidad de Contratación DNCP en data.dncp.modalidad');
-    }
-    if (!(data['dncp'] && data['dncp']['entidad'] && data['dncp']['entidad'].length > 0)) {
-      this.errors.push('Debe informar la entidad de Contratación DNCP en data.dncp.entidad');
-    }
-    if (!(data['dncp'] && data['dncp']['año'] && data['dncp']['año'].length > 0)) {
-      this.errors.push('Debe informar la año de Contratación DNCP en data.dncp.año');
-    }
-    if (!(data['dncp'] && data['dncp']['secuencia'] && data['dncp']['secuencia'].length > 0)) {
-      this.errors.push('Debe informar la secuencia de Contratación DNCP en data.dncp.secuencia');
-    }
-    if (!(data['dncp'] && data['dncp']['fecha'] && data['dncp']['fecha'].length > 0)) {
-      this.errors.push('Debe informar la fecha de emisión de código de Contratación DNCP en data.dncp.fecha');
-    }
-  }
-
-  private generateDatosEspecificosPorTipoDE_AutofacturaValidate(params: any, data: any) {
-    if (!data['autoFactura']) {
-      this.errors.push('Para tipoDocumento = 4 debe proveer los datos de Autofactura en data.autoFactura');
-    }
-    if (!data['autoFactura']['ubicacion']) {
-      this.errors.push(
-        'Para tipoDocumento = 4 debe proveer los datos del Lugar de Transacción de la Autofactura en data.autoFactura.ubicacion',
-      );
-    }
-
-    if (!data['autoFactura']['tipoVendedor']) {
-      this.errors.push('Debe especificar la Naturaleza del Vendedor en data.autoFactura.tipoVendedor');
-    }
-
-    if (!data['autoFactura']['documentoTipo']) {
-      this.errors.push('Debe especificar el Tipo de Documento del Vendedor en data.autoFactura.documentoTipo');
-    }
-
-    if (
-      constanteService.naturalezaVendedorAutofactura.filter(
-        (um: any) => um.codigo === data['autoFactura']['tipoVendedor'],
-      ).length == 0
-    ) {
-      this.errors.push(
-        "Tipo de Vendedor '" +
-          data['autoFactura']['tipoVendedor'] +
-          "' en data.autoFactura.tipoVendedor no encontrado. Valores: " +
-          constanteService.naturalezaVendedorAutofactura.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
-    if (
-      constanteService.tiposDocumentosIdentidades.filter(
-        (um: any) => um.codigo === data['autoFactura']['documentoTipo'],
-      ).length == 0
-    ) {
-      this.errors.push(
-        "Tipo de Documento '" +
-          data['autoFactura']['documentoTipo'] +
-          "' en data.autoFactura.documentoTipo no encontrado. Valores: " +
-          constanteService.tiposDocumentosIdentidades.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
-    if (!data['autoFactura']['ubicacion']) {
-      this.errors.push('Debe especificar la ubicación de la transacción en data.autoFactura.ubicacion');
-    }
-
-    if (!data['autoFactura']['documentoNumero']) {
-      this.errors.push('Debe especificar el Nro. de Documento del Vendedor en data.autoFactura.documentoNumero');
-    }
-    if (!data['autoFactura']['nombre']) {
-      this.errors.push('Debe especificar el Nombre del Vendedor en data.autoFactura.nombre');
-    }
-    if (!data['autoFactura']['direccion']) {
-      this.errors.push('Debe especificar la Dirección del Vendedor en data.autoFactura.direccion');
-    }
-    if (!data['autoFactura']['numeroCasa']) {
-      this.errors.push('Debe especificar el Número de Casa del Vendedor en data.autoFactura.numeroCasa');
-    }
-
-    if (!data['autoFactura']['departamento']) {
-      this.errors.push('Debe especificar el Departamento del Vendedor en data.autoFactura.departamento');
-    }
-    if (!data['autoFactura']['distrito']) {
-      this.errors.push('Debe especificar el Distrito Vendedor en data.autoFactura.distrito');
-    }
-    if (!data['autoFactura']['ciudad']) {
-      this.errors.push('Debe especificar la Ciudad del Vendedor en data.autoFactura.ciudad');
-    }
-
-    if (!data['autoFactura']['ubicacion']['departamento']) {
-      this.errors.push(
-        'Debe especificar el Departamento del Lugar de la Transacción en data.autoFactura.ubicacion.departamento',
-      );
-    }
-    if (!data['autoFactura']['ubicacion']['distrito']) {
-      this.errors.push(
-        'Debe especificar el Distrito del Lugar de la Transacciónen data.autoFactura.ubicacion.distrito',
-      );
-    }
-    if (!data['autoFactura']['ubicacion']['ciudad']) {
-      this.errors.push('Debe especificar la Ciudad del Lugar de la Transacción en data.autoFactura.ubicacion.ciudad');
-    }
-
-    constanteService.validateDepartamentoDistritoCiudad(
-      'data.autoFactura',
-      +data['autoFactura']['departamento'],
-      +data['autoFactura']['distrito'],
-      +data['autoFactura']['ciudad'],
-      this.errors,
-    );
-
-    constanteService.validateDepartamentoDistritoCiudad(
-      'data.autoFactura.ubicacion',
-      +data['autoFactura']['ubicacion']['departamento'],
-      +data['autoFactura']['ubicacion']['distrito'],
-      +data['autoFactura']['ubicacion']['ciudad'],
-      this.errors,
-    );
-  }
-
-  private generateDatosEspecificosPorTipoDE_NotaCreditoDebitoValidate(params: any, data: any) {
-    if (!data['notaCreditoDebito']['motivo']) {
-      this.errors.push('Debe completar el motivo para la nota de crédito/débito en data.notaCreditoDebito.motivo');
-    }
-
-    if (
-      constanteService.notasCreditosMotivos.filter((um: any) => um.codigo === data['notaCreditoDebito']['motivo'])
-        .length == 0
-    ) {
-      this.errors.push(
-        "Motivo de la Nota de Crédito/Débito '" +
-          data['notaCreditoDebito']['motivo'] +
-          "' en data.notaCreditoDebito.motivo no encontrado. Valores: " +
-          constanteService.notasCreditosMotivos.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-  }
-
-  private generateDatosEspecificosPorTipoDE_RemisionElectronicaValidate(params: any, data: any) {
-    if (!(data['remision'] && data['remision']['motivo'])) {
-      this.errors.push('No fue pasado el Motivo de la Remisión en data.remision.motivo.');
-    }
-
-    if (!(data['remision'] && data['remision']['tipoResponsable'])) {
-      this.errors.push('No fue pasado el Tipo de Responsable de la Remisión en data.remision.tipoResponsable.');
-    }
-
-    if (constanteService.remisionesMotivos.filter((um: any) => um.codigo === data['remision']['motivo']).length == 0) {
-      this.errors.push(
-        "Motivo de la Remisión '" +
-          data['remision']['motivo'] +
-          "' en data.remision.motivo no encontrado. Valores: " +
-          constanteService.remisionesMotivos.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
-    if (data['remision'] && data['remision']['motivo'] == 7) {
-      if (data['cliente']['ruc'] != params['ruc']) {
-        this.errors.push('RUC del receptor no coincidente con el RUC del emisor');
-      }
-    }
-
-    if (
-      constanteService.remisionesResponsables.filter((um: any) => um.codigo === data['remision']['tipoResponsable'])
-        .length == 0
-    ) {
-      this.errors.push(
-        "Tipo de Responsable '" +
-          data['remision']['tipoResponsable'] +
-          "' en data.remision.tipoResponsable no encontrado. Valores: " +
-          constanteService.remisionesResponsables.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
-  }
-
   private generateDatosCondicionOperacionDEValidate(params: any, data: any) {
     if (!data['condicion']) {
       this.errors.push('Debe indicar los datos de la Condición de la Operación en data.condicion');
@@ -1056,108 +782,103 @@ class JSonDeMainValidateService {
     }
   }
 
-
-  /**
-   * H. Campos que identifican al documento asociado (H001-H049)
+/**
    *
    * @param params
    * @param data
    * @param options
    */
-  public generateDatosDocumentoAsociadoValidate(params: any, data: any) {
-    if (data['tipoTransaccion'] == 11 && !data['documentoAsociado']['resolucionCreditoFiscal']) {
-      this.errors.push('Obligatorio informar data.documentoAsociado.resolucionCreditoFiscal');
+  public generateDatosDocumentosAsociadosValidate(params: any, data: any) {
+    for (let i = 0; i < data['documentosAsociados'].length; i++) {
+      this.generateDatosDocumentoAsociadoValidate(params, data['documentosAsociados'][i], i);
+    }
+  }
+
+  /**
+   * H. Campos que identifican al documento asociado (H001-H049)
+   *
+   * @param params
+   * @param documentoAsociado
+   * @param options
+   */
+  public generateDatosDocumentoAsociadoValidate(params: any, documentoAsociado: any, i: number) {
+    if (documentoAsociado['tipoTransaccion'] == 11 && !documentoAsociado['resolucionCreditoFiscal']) {
+      this.errors.push('Obligatorio informar data.documentosAsociados[' + i + '].resolucionCreditoFiscal');
     }
 
     //Validaciones
     if (
-      constanteService.tiposDocumentosAsociados.filter((um) => um.codigo === data['documentoAsociado']['formato'])
+      constanteService.tiposDocumentosAsociados.filter((um) => um.codigo === documentoAsociado['formato'])
         .length == 0
     ) {
       this.errors.push(
         "Formato de Documento Asociado '" +
-          data['documentoAsociado']['formato'] +
-          "' en data.documentoAsociado.formato no encontrado. Valores: " +
+          documentoAsociado['formato'] +
+          "' en data.documentosAsociados[" + i + "].formato no encontrado. Valores: " +
           constanteService.tiposDocumentosAsociados.map((a) => a.codigo + '-' + a.descripcion),
       );
     }
 
-    if (data['documentoAsociado']['tipo'] == 2) {
+    if (documentoAsociado['tipo'] == 2) {
       if (
         constanteService.tiposDocumentosImpresos.filter(
-          (um) => um.codigo === data['documentoAsociado']['tipoDocumentoImpreso'],
+          (um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'],
         ).length == 0
       ) {
         this.errors.push(
           "Tipo de Documento impreso '" +
-            data['documentoAsociado']['tipoDocumentoImpreso'] +
-            "' en data.documentoAsociado.tipoDocumentoImpreso no encontrado. Valores: " +
+            documentoAsociado['tipoDocumentoImpreso'] +
+            "' en data.documentosAsociados[" + i + "].tipoDocumentoImpreso no encontrado. Valores: " +
             constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
         );
       }
     }
 
-    if (data['documentoAsociado']['formato'] == 1) {
+    if (documentoAsociado['formato'] == 1) {
       //H002 = Electronico
-      if (!(data['documentoAsociado']['cdc'] && data['documentoAsociado']['cdc'].length >= 44)) {
-        this.errors.push('Debe indicar el CDC asociado en data.documentoAsociado.cdc');
+      if (!(documentoAsociado['cdc'] && documentoAsociado['cdc'].length >= 44)) {
+        this.errors.push('Debe indicar el CDC asociado en data.documentosAsociados[' + i + '].cdc');
       }
     }
 
-    if (data['documentoAsociado']['formato'] == 2) {
+    if (documentoAsociado['formato'] == 2) {
       //H002 = Impreso
-      if (!data['documentoAsociado']['timbrado']) {
+      if (!documentoAsociado['timbrado']) {
         this.errors.push(
-          'Debe especificar el Timbrado del Documento impreso Asociado en data.documentoAsociado.timbrado',
+          'Debe especificar el Timbrado del Documento impreso Asociado en data.documentosAsociados[' + i + '].timbrado',
         );
       }
-      if (!data['documentoAsociado']['establecimiento']) {
+      if (!documentoAsociado['establecimiento']) {
         this.errors.push(
-          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentoAsociado.establecimiento',
+          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentosAsociados[' + i + '].establecimiento',
         );
       }
-      if (!data['documentoAsociado']['punto']) {
-        this.errors.push('Debe especificar el Punto del Documento impreso Asociado en data.documentoAsociado.punto');
+      if (!documentoAsociado['punto']) {
+        this.errors.push('Debe especificar el Punto del Documento impreso Asociado en data.documentosAsociados[' + i + '].punto');
       }
 
-      if (!data['documentoAsociado']['numero']) {
-        this.errors.push('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');
+      if (!documentoAsociado['numero']) {
+        this.errors.push('Debe especificar el Número del Documento impreso Asociado en data.documentosAsociados[' + i + '].numero');
       }
 
-      if (!data['documentoAsociado']['tipoDocumentoImpreso']) {
+      if (!documentoAsociado['tipoDocumentoImpreso']) {
         this.errors.push(
-          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentoAsociado.tipoDocumentoImpreso',
+          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentosAsociados[' + i + '].tipoDocumentoImpreso',
         );
       }
 
-      if (data['documentoAsociado']['fecha']) {
-        if ((data['documentoAsociado']['fecha'] + '').length != 10) {
+      if (documentoAsociado['fecha']) {
+        if ((documentoAsociado['fecha'] + '').length != 10) {
           this.errors.push(
-            'La Fecha del Documento impreso Asociado en data.documentoAsociado.fecha debe tener una longitud de 10 caracteres',
+            'La Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha debe tener una longitud de 10 caracteres',
           );
         }
       } else {
-        this.errors.push('Debe especificar la Fecha del Documento impreso Asociado en data.documentoAsociado.fecha');
+        this.errors.push('Debe especificar la Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha');
       }
     }
 
-    if (data['documentoAsociado']['formato'] == 3) {
-      //H002 = Constancia electronica
-      if (data['documentoAsociado']['constanciaTipo']) {
-        if (
-          constanteService.tiposConstancias.filter((um) => um.codigo === data['documentoAsociado']['constanciaTipo'])
-            .length == 0
-        ) {
-          this.errors.push(
-            "Tipo de Constancia '" +
-              data['documentoAsociado']['constanciaTipo'] +
-              "' en data.documentoAsociado.constanciaTipo no encontrado. Valores: " +
-              constanteService.tiposConstancias.map((a) => a.codigo + '-' + a.descripcion),
-          );
-        }
-      }
-    }
   }
 }
 
-export default new JSonDeMainValidateService();
+export default new JSonReciboValidateService();
