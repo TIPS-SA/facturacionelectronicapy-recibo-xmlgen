@@ -60,9 +60,11 @@ class JSonReciboValidateService {
 
     if (!(data['documentosAsociados'] && Array.isArray(data['documentosAsociados']))) {
       this.errors.push('Dato/s de/los Documento/s asociado/s es/son obligatorio/s en data.documentosAsociados');
+    } else {
+      this.generateDatosDocumentosAsociadosValidate(params, data);
     }
 
-    this.generateDatosDocumentosAsociadosValidate(params, data);
+    
 
     //Tratamiento Final, del Envio del Error, no tocar
     if (this.errors.length > 0) {
