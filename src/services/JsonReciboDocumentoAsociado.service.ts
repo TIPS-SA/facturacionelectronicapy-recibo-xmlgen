@@ -1,4 +1,4 @@
-import constanteService from './constante.service';
+import constanteService from './constante.service2';
 import stringUtilService from './StringUtil.service';
 
 class JsonReciboDocumentoAsociadoService {
