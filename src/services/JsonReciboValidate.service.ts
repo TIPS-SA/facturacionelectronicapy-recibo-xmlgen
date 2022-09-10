@@ -1,6 +1,6 @@
 import stringUtilService from './StringUtil.service';
 import fechaUtilService from './FechaUtil.service';
-import constanteService from './constante.service2';
+import constanteService from './constante.service';
 import { XmlgenConfig } from './type.interface.';
 
 class JSonReciboValidateService {
