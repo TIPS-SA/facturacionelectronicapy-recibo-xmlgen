@@ -1,11 +1,12 @@
 import constanteService from './constants.service';
 import stringUtilService from './StringUtil.service';
+import { XmlgenConfig } from './type.interface.';
 
 class JsonReciboDocumentoAsociadoService {
-  public generateDocumentosAsociados(params: any, data: any) {
+  public generateDocumentosAsociados(params: any, data: any, config: XmlgenConfig ) {
     const jsonResult = new Array();
     for (let i = 0; i < data.documentosAsociados.length; i++) {
-      const daResult = this.generateDocumentoAsociado(params, data.documentosAsociados[i]);
+      const daResult = this.generateDocumentoAsociado(params, data.documentosAsociados[i], config );
       jsonResult.push(daResult);
     }
     return jsonResult;
@@ -16,7 +17,7 @@ class JsonReciboDocumentoAsociadoService {
    * @param doumentoAsociado
    * @param options
    */
-  public generateDocumentoAsociado(params: any, doumentoAsociado: any) {
+  public generateDocumentoAsociado(params: any, doumentoAsociado: any, config: XmlgenConfig) {
     const jsonResult: any = {
       iTipDocAso: doumentoAsociado['formato'],
       dDesTipDocAso: constanteService.tiposDocumentosAsociados.filter(
@@ -89,6 +90,8 @@ class JsonReciboDocumentoAsociadoService {
     ) {
       jsonResult['dNumResCF'] = doumentoAsociado['resolucionCreditoFiscal'].substring(0, 15);
     }
+
+    jsonResult['monto'] = parseFloat(doumentoAsociado['monto'].toFixed(config.decimals));
 
     return jsonResult;
   }

@@ -14,38 +14,16 @@ class ReciboXmlTotalesService {
       moneda = 'PYG';
     }
 
-    let dSubExe = 0,
-      dSubExo = 0,
-      dSub5 = 0,
-      dSub10 = 0,
-      dTotOpe = 0,
-      dTotDesc = 0,
-      dTotDescGlotem = 0,
-      dTotAntItem = 0,
-      dTotAnt = 0,
-      dDescTotal = 0,
-      dAnticipo = 0,
-      dTotOpeGs = 0,
-      dIVA5 = 0,
-      dIVA10 = 0,
-      dLiqTotIVA5 = 0,
-      dLiqTotIVA10 = 0,
-      dBaseGrav5 = 0,
-      dBaseGrav10 = 0;
+    let sumaMontos = 0;
+    for (let i = 0; i < data.documentosAsociados.length; i++) {
 
-    let agregarDSub = false;
-    //Crear las variables
-
-    if (
-      data['tipoImpuesto'] == 1 ||
-      data['tipoImpuesto'] == 3 ||
-      data['tipoImpuesto'] == 4 ||
-      data['tipoImpuesto'] == 5
-    ) {
-      if (data['tipoDocumento'] != 4) {
-        dTotOpe = dSubExe + dSubExo + dSub5 + dSub10; // Suma (F002, F003, F004 y F005)
-      }
+      sumaMontos += parseFloat(data.documentosAsociados[i]['monto'].toFixed(config.decimals));
+      
     }
+
+    let 
+      dTotOpe = sumaMontos,
+      dTotOpeGs = 0;
 
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
@@ -65,169 +43,36 @@ class ReciboXmlTotalesService {
       }
     }
 
-    if (!(data['tipoImpuesto'] != 1 && data['tipoImpuesto'] != 5)) {
-      //No debe existir si D013 != 1 o D013 != 5
-      if (dIVA5 > 0) {
-        dLiqTotIVA5 = dRedon / 1.05; //Consultar
-        dLiqTotIVA5 = Math.round(dLiqTotIVA5);
-      }
-
-      if (dIVA10 > 0) {
-        dLiqTotIVA10 = dRedon / 1.1;
-        dLiqTotIVA10 = Math.round(dLiqTotIVA10);
-      }
-    }
-
-    let comisionLiquid = ((data['comision'] || 0) * 10) / 100;
-
     //---
     //Corresponde al cálculo aritmético F008 - F013 + F025
-    let dTotGralOpe = dTotOpe - dRedon + (data['comision'] || 0);
+    let dTotGralOpe = dTotOpe - dRedon;
     if (data.moneda != 'PYG') {
       dTotGralOpe = parseFloat(dTotGralOpe.toFixed(config.decimals));
     }
-    //dTotOpe + dRedon + dComi;
-    //Si C002 = 1, 5 o 6, entonces dTotGralOpe(F014) = F008 - F011 - F012 - F013
-    /*if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 5 || data['tipoDocumento'] == 6) {
-      dTotGralOpe = dTotOpe - dDescTotal - dAnticipo - dRedon;
-    }*/
+    
     //---
 
     //Asignar al JSON DATA
     let jsonResult: any = {
-      dSubExe: dSubExe,
-      dSubExo: dSubExo,
     };
 
-    if (agregarDSub) {
-      if (!(data['tipoImpuesto'] != 1)) {
-        //No debe existir si D013 != 1        if (dSub5 > 0) {
-        jsonResult['dSub5'] = dSub5;
-
-        if (data.moneda != 'PYG') {
-          jsonResult['dSub5'] = parseFloat(dSub5.toFixed(config.decimals));
-        }
-      }
-
-      if (dSub10 > 0) {
-        jsonResult['dSub10'] = dSub10;
-
-        if (data.moneda != 'PYG') {
-          jsonResult['dSub10'] = parseFloat(dSub10.toFixed(config.decimals));
-        }
-      }
-    }
 
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
     } else {
       dTotOpe = parseFloat(dTotOpe.toFixed(0));
     }
-    if (data.moneda != 'PYG') {
-      dTotDesc = parseFloat(dTotDesc.toFixed(config.decimals));
-    } else {
-      dTotDesc = parseFloat(dTotDesc.toFixed(0));
-    }
-    if (data.moneda != 'PYG') {
-      dTotDescGlotem = parseFloat(dTotDescGlotem.toFixed(config.decimals));
-    } else {
-      dTotDescGlotem = parseFloat(dTotDescGlotem.toFixed(0));
-    }
-    if (data.moneda != 'PYG') {
-      dDescTotal = parseFloat(dDescTotal.toFixed(config.decimals));
-    } else {
-      dDescTotal = parseFloat(dDescTotal.toFixed(0));
-    }
+
     jsonResult = Object.assign(jsonResult, {
       dTotOpe: dTotOpe, //F008
-      dTotDesc: dTotDesc,
-      dTotDescGlotem: dTotDescGlotem,
-      dTotAntItem: dTotAntItem,
-      dTotAnt: dTotAnt,
-      dPorcDescTotal: data['porcentajeDescuento'] || 0,
-      dDescTotal: dDescTotal,
-      dAnticipo: dAnticipo,
       dRedon: dRedon, //F013
     });
-
-    if (data['comision'] > 0) {
-      jsonResult['dComi'] = data['comision'];
-    }
 
     jsonResult = Object.assign(jsonResult, {
       dTotGralOpe: dTotGralOpe, //F014
     });
 
-    //Redondeo
-    dIVA5 = parseFloat(dIVA5.toFixed(config.decimals));
-    dIVA10 = parseFloat(dIVA10.toFixed(config.decimals));
-    dLiqTotIVA5 = parseFloat(dLiqTotIVA5.toFixed(config.decimals));
-    dLiqTotIVA10 = parseFloat(dLiqTotIVA10.toFixed(config.decimals));
-
-    if (data.moneda === 'PYG') {
-      dIVA5 = parseFloat(dIVA5.toFixed(0));
-      dIVA10 = parseFloat(dIVA10.toFixed(0));
-      dLiqTotIVA5 = parseFloat(dLiqTotIVA5.toFixed(0));
-      dLiqTotIVA10 = parseFloat(dLiqTotIVA10.toFixed(0));
-    }
-
-    if (agregarDSub) {
-      jsonResult['dIVA5'] = dIVA5;
-      jsonResult['dIVA10'] = dIVA10;
-      jsonResult['dLiqTotIVA5'] = dLiqTotIVA5;
-      jsonResult['dLiqTotIVA10'] = dLiqTotIVA10;
-    }
-
-    if (comisionLiquid > 0) {
-      jsonResult = Object.assign(jsonResult, {
-        dIVAComi: comisionLiquid,
-      });
-    }
-
-    if (agregarDSub) {
-      if (dIVA5 > 0 || dIVA10 > 0 || dLiqTotIVA5 > 0 || dLiqTotIVA10 > 0 || comisionLiquid > 0) {
-        jsonResult['dTotIVA'] = dIVA5 + dIVA10 - dLiqTotIVA5 - dLiqTotIVA10 + comisionLiquid;
-
-        //Redondeo
-
-        jsonResult['dTotIVA'] = parseFloat(jsonResult['dTotIVA'].toFixed(config.decimals));
-        if (data.moneda === 'PYG') {
-          jsonResult['dTotIVA'] = parseFloat(jsonResult['dTotIVA'].toFixed(0));
-        }
-      }
-      if (dBaseGrav5 > 0) {
-        dBaseGrav5 = parseFloat(dBaseGrav5.toFixed(config.decimals));
-        if (data.moneda === 'PYG') {
-          dBaseGrav5 = parseFloat(dBaseGrav5.toFixed(0));
-        }
-
-        jsonResult['dBaseGrav5'] = dBaseGrav5;
-      }
-      if (dBaseGrav10 > 0) {
-        dBaseGrav10 = parseFloat(dBaseGrav10.toFixed(config.decimals));
-        if (data.moneda === 'PYG') {
-          dBaseGrav10 = parseFloat(dBaseGrav10.toFixed(0));
-        }
-
-        jsonResult['dBaseGrav10'] = dBaseGrav10;
-      }
-      if (dBaseGrav5 > 0 || dBaseGrav10 > 0) {
-        let toFixed = config.decimals;
-        if (moneda == 'PYG') {
-          toFixed = 0;
-        }
-
-        jsonResult['dTBasGraIVA'] = parseFloat(
-          ((dBaseGrav5 > 0 ? dBaseGrav5 : 0) + (dBaseGrav10 > 0 ? dBaseGrav10 : 0)).toFixed(toFixed),
-        );
-      }
-    }
     if (moneda != 'PYG' && data['condicionTipoCambio'] == 1) {
-      if (!data['cambio']) {
-        /*throw new Error(
-          'Debe especificar el valor del Cambio en data.cambio cuando moneda != PYG y la Cotización es Global',
-        );*/
-      }
 
       //Por el Global
       jsonResult['dTotalGs'] = parseFloat((dTotGralOpe * data['cambio']).toFixed(0));

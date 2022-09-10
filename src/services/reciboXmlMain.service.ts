@@ -64,7 +64,12 @@ class ReciboXmlMainService {
     this.generateDatosGenerales(params, data, config);
     //---
 
-    //this.generateDatosCondicionOperacionDE(params, data);
+
+    if ( ! this.json['rDE']['recibo']['gDtipDE']) {
+      this.json['rDE']['recibo']['gDtipDE'] = {};
+    }
+
+    this.generateDatosCondicionOperacionDE(params, data);
 
     this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config); //Marcos
 
@@ -72,6 +77,7 @@ class ReciboXmlMainService {
       this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDocumentosAsociados(
         params,
         data,
+        config
       );
     }
 
@@ -88,8 +94,8 @@ class ReciboXmlMainService {
   }
 
   /**
-   * Genera el CDC para la Factura
-   * Corresponde al Id del DE
+   * Genera el CDC para el Recibo
+   * Corresponde al Id del Recibo
    *
    * @param params
    * @param data
@@ -102,12 +108,9 @@ class ReciboXmlMainService {
 
       //Como se va utilizar el CDC enviado como parametro, va a verificar que todos los datos del XML coincidan con el CDC.
       const tipoDocumentoCDC = this.codigoControl.substring(0, 2);
-      //const rucCDC = this.codigoControl.substring(2, 10);
-      //const dvCDC = this.codigoControl.substring(10, 11);
       const establecimientoCDC = this.codigoControl.substring(11, 14);
       const puntoCDC = this.codigoControl.substring(14, 17);
       const numeroCDC = this.codigoControl.substring(17, 24);
-      //const tipoContribuyenteCDC = this.codigoControl.substring(24, 25);
       const fechaCDC = this.codigoControl.substring(25, 33);
       const tipoEmisionCDC = this.codigoControl.substring(33, 34);
 
@@ -618,16 +621,6 @@ class ReciboXmlMainService {
    * @param options
    */
   private generateDatosCondicionOperacionDE(params: any, data: any) {
-    if (
-      constanteService.condicionesOperaciones.filter((um: any) => um.codigo === data['condicion']['tipo']).length == 0
-    ) {
-      /*throw new Error(
-        "Condición de la Operación '" +
-          data['condicion']['tipo'] +
-          "' en data.condicion.tipo no encontrado. Valores: " +
-          constanteService.condicionesOperaciones.map((a: any) => a.codigo + '-' + a.descripcion),
-      );*/
-    }
 
     this.json['rDE']['recibo']['gDtipDE']['gCamCond'] = {
       iCondOpe: data['condicion']['tipo'],

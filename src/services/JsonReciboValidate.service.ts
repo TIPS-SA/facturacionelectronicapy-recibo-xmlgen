@@ -444,15 +444,12 @@ class JSonReciboValidateService {
         //data['cliente']['distrito'] y data['cliente']['departamento']
         let objCiudad: any = constanteService.ciudades.filter((ciu) => ciu.codigo === +data['cliente']['ciudad']);
 
-        console.log('ciudad', objCiudad);
         let objDistrito: any = constanteService.distritos.filter((dis) => dis.codigo === +objCiudad[0]['distrito']);
 
-        console.log('objDistrito', objDistrito);
         let objDepartamento: any = constanteService.distritos.filter(
           (dep) => dep.codigo === +objDistrito[0]['departamento'],
         );
 
-        console.log('objDepartamento', objDepartamento);
         data['cliente']['distrito'] = objDistrito[0]['codigo'];
 
         data['cliente']['departamento'] = objDepartamento[0]['codigo'];

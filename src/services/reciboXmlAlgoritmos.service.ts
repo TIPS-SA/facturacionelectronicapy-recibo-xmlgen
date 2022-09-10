@@ -68,7 +68,7 @@ class JSonDteAlgoritmosService {
     if (params['ruc'].indexOf('-') == -1) {
       throw new Error('RUC debe contener dígito verificador en params.ruc');
     }
-    const tipoDocumento = data['tipoDocumento'];
+    const tipoDocumento = 55; //Valor fijo para recibo
     const rucEmisor = stringUtilService.leftZero(params['ruc'].split('-')[0], 8);
     const dvEmisor = params['ruc'].split('-')[1];
     const establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
@@ -76,8 +76,10 @@ class JSonDteAlgoritmosService {
     const numero = stringUtilService.leftZero(data['numero'], 7);
     const tipoContribuyente = params['tipoContribuyente'];
     const fechaEmision = fechaUtilService.convertToAAAAMMDD(new Date(data['fecha']));
-    const tipoEmision = data['tipoEmision']; //1=Normal 2=Contingencia
+//    const tipoEmision = data['tipoEmision']; //1=Normal 2=Contingencia
+    const tipoEmision = 1; //1=Normal 2=Contingencia
     const codigoSeguridadAleatorio = codigoSeguridad;
+    //const codigoSeguridadAleatorio = 111111;  //Valor fijo para recibo
 
     let cdc =
       stringUtilService.leftZero(tipoDocumento, 2) +
