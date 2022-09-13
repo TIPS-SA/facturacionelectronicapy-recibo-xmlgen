@@ -3,10 +3,10 @@ import stringUtilService from './StringUtil.service';
 import { XmlgenConfig } from './type.interface.';
 
 class JsonReciboDocumentoAsociadoService {
-  public generateDocumentosAsociados(params: any, data: any, config: XmlgenConfig ) {
+  public generateDocumentosAsociados(params: any, data: any, config: XmlgenConfig) {
     const jsonResult = new Array();
     for (let i = 0; i < data.documentosAsociados.length; i++) {
-      const daResult = this.generateDocumentoAsociado(params, data.documentosAsociados[i], config );
+      const daResult = this.generateDocumentoAsociado(params, data.documentosAsociados[i], config);
       jsonResult.push(daResult);
     }
     return jsonResult;

@@ -16,13 +16,10 @@ class ReciboXmlTotalesService {
 
     let sumaMontos = 0;
     for (let i = 0; i < data.documentosAsociados.length; i++) {
-
       sumaMontos += parseFloat(data.documentosAsociados[i]['monto'].toFixed(config.decimals));
-      
     }
 
-    let 
-      dTotOpe = sumaMontos,
+    let dTotOpe = sumaMontos,
       dTotOpeGs = 0;
 
     if (data.moneda != 'PYG') {
@@ -49,13 +46,11 @@ class ReciboXmlTotalesService {
     if (data.moneda != 'PYG') {
       dTotGralOpe = parseFloat(dTotGralOpe.toFixed(config.decimals));
     }
-    
+
     //---
 
     //Asignar al JSON DATA
-    let jsonResult: any = {
-    };
-
+    let jsonResult: any = {};
 
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
@@ -73,7 +68,6 @@ class ReciboXmlTotalesService {
     });
 
     if (moneda != 'PYG' && data['condicionTipoCambio'] == 1) {
-
       //Por el Global
       jsonResult['dTotalGs'] = parseFloat((dTotGralOpe * data['cambio']).toFixed(0));
     }

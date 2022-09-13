@@ -64,8 +64,6 @@ class JSonReciboValidateService {
       this.generateDatosDocumentosAsociadosValidate(params, data);
     }
 
-    
-
     //Tratamiento Final, del Envio del Error, no tocar
     if (this.errors.length > 0) {
       let errorExit: any = new Error();
@@ -836,7 +834,7 @@ class JSonReciboValidateService {
       }
     }
 
-  /*  if (documentoAsociado['formato'] == 2) {
+    /*  if (documentoAsociado['formato'] == 2) {
       //H002 = Impreso
       if (!documentoAsociado['timbrado']) {
         this.errors.push(
@@ -886,7 +884,6 @@ class JSonReciboValidateService {
     }
     */
   }
-  
 }
 
 export default new JSonReciboValidateService();

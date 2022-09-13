@@ -64,8 +64,7 @@ class ReciboXmlMainService {
     this.generateDatosGenerales(params, data, config);
     //---
 
-
-    if ( ! this.json['rDE']['recibo']['gDtipDE']) {
+    if (!this.json['rDE']['recibo']['gDtipDE']) {
       this.json['rDE']['recibo']['gDtipDE'] = {};
     }
 
@@ -77,7 +76,7 @@ class ReciboXmlMainService {
       this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDocumentosAsociados(
         params,
         data,
-        config
+        config,
       );
     }
 
@@ -336,7 +335,7 @@ class ReciboXmlMainService {
   private generateDatosTimbrado(params: any, data: any) {
     this.json['rDE']['recibo']['gTimb'] = {
       iTiDE: 55,
-      dDesTiDE: "Recibo",
+      dDesTiDE: 'Recibo',
       dNumTim: params['timbradoNumero'],
       dEst: stringUtilService.leftZero(data['establecimiento'], 3),
       dPunExp: stringUtilService.leftZero(data['punto'], 3),
@@ -621,7 +620,6 @@ class ReciboXmlMainService {
    * @param options
    */
   private generateDatosCondicionOperacionDE(params: any, data: any) {
-
     this.json['rDE']['recibo']['gDtipDE']['gCamCond'] = {
       iCondOpe: data['condicion']['tipo'],
       dDCondOpe: constanteService.condicionesOperaciones.filter((co) => co.codigo === data['condicion']['tipo'])[0][
