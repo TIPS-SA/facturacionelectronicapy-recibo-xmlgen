@@ -836,7 +836,7 @@ class JSonReciboValidateService {
       }
     }
 
-    if (documentoAsociado['formato'] == 2) {
+  /*  if (documentoAsociado['formato'] == 2) {
       //H002 = Impreso
       if (!documentoAsociado['timbrado']) {
         this.errors.push(
@@ -884,7 +884,9 @@ class JSonReciboValidateService {
         );
       }
     }
+    */
   }
+  
 }
 
 export default new JSonReciboValidateService();

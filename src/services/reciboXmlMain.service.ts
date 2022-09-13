@@ -335,8 +335,8 @@ class ReciboXmlMainService {
    */
   private generateDatosTimbrado(params: any, data: any) {
     this.json['rDE']['recibo']['gTimb'] = {
-      iTiDE: data['tipoDocumento'],
-      dDesTiDE: data['tipoDocumentoDescripcion'],
+      iTiDE: 55,
+      dDesTiDE: "Recibo",
       dNumTim: params['timbradoNumero'],
       dEst: stringUtilService.leftZero(data['establecimiento'], 3),
       dPunExp: stringUtilService.leftZero(data['punto'], 3),
