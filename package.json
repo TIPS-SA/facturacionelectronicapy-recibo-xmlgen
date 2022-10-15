@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen.git"
+    "url": "https://github.com/marcosjara/facturacionelectronicapy-recibo-xmlgen.git"
   },
   "keywords": [
     "Facturacion electrónica",
@@ -34,9 +34,9 @@
   "author": "Marcos Jara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen/issues"
+    "url": "https://github.com/marcosjara/facturacionelectronicapy-recibo-xmlgen/issues"
   },
-  "homepage": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen#readme",
+  "homepage": "https://github.com/marcosjara/facturacionelectronicapy-recibo-xmlgen#readme",
   "dependencies": {
     "copyfiles": "^2.4.1",
     "fs": "0.0.1-security",
