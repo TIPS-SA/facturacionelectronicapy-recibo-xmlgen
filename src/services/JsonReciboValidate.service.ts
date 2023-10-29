@@ -58,11 +58,8 @@ class JSonReciboValidateService {
       }
     }
 
-    if (!(data['documentosAsociados'] && Array.isArray(data['documentosAsociados']))) {
-      this.errors.push('Dato/s de/los Documento/s asociado/s es/son obligatorio/s en data.documentosAsociados');
-    } else {
-      this.generateDatosDocumentosAsociadosValidate(params, data);
-    }
+
+    this.generateDatosDocumentosAsociadosValidate(params, data);
 
     //Tratamiento Final, del Envio del Error, no tocar
     if (this.errors.length > 0) {
@@ -257,12 +254,12 @@ class JSonReciboValidateService {
       }
     }
 
-    if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
+    /*if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
       //Obligatorio informar iTipTra D011
       if (!data['tipoTransaccion']) {
         this.errors.push('Debe proveer el Tipo de Transacción en data.tipoTransaccion');
       }
-    }
+    }*/
 
     if (moneda != 'PYG') {
       if (!data['condicionTipoCambio']) {
@@ -385,32 +382,6 @@ class JSonReciboValidateService {
       );
     }
 
-    if (data['tipoDocumento'] == 4) {
-      if (data['cliente']['tipoOperacion'] != 2) {
-        this.errors.push('El Tipo de Operación debe ser 2-B2C para el Tipo de Documento AutoFactura');
-      }
-    }
-
-    if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion']) {
-      //Obligatorio completar D210
-
-      if (data['cliente']['tipoOperacion'] != 4 && !data['cliente']['documentoNumero']) {
-        this.errors.push('Debe informar el número de documento en data.cliente.documentoNumero');
-      }
-
-      if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
-        if (!data['cliente']['documentoTipo']) {
-          this.errors.push('Debe informar el Tipo de Documento del Cliente en data.cliente.documentoTipo');
-        }
-      }
-    }
-
-    if (data['tipoDocumento'] === 7 || data['cliente']['tipoOperacion'] === 4) {
-      if (!data['cliente']['direccion']) {
-        this.errors.push('data.cliente.direccion es Obligatorio para Tipo de Documento 7 o Tipo de Operación 4');
-      }
-    }
-
     if (data['cliente']['direccion']) {
       //Si tiene dirección hay que completar numero de casa.
       if (!data['cliente']['numeroCasa']) {
@@ -424,10 +395,7 @@ class JSonReciboValidateService {
       }
     }
 
-    if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
-      if (!data['cliente']['ciudad']) {
-        this.errors.push('Obligatorio especificar la Ciudad en data.cliente.ciudad para Tipo de Documento != 4');
-      } else {
+      if (data['cliente']['ciudad']) {
         if (
           constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0
         ) {
@@ -455,9 +423,9 @@ class JSonReciboValidateService {
         data['cliente']['departamento'] = objDepartamento[0]['codigo'];
       }
 
-      if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
+      if (data['cliente']['direccion'] ) {
         if (!data['cliente']['distrito']) {
-          this.errors.push('Obligatorio especificar el Distrito en data.cliente.distrito para Tipo de Documento != 4');
+          this.errors.push('Obligatorio especificar el Distrito en data.cliente.distrito');
         } else {
           if (
             constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito'])
@@ -473,7 +441,7 @@ class JSonReciboValidateService {
         }
       }
 
-      if (data['cliente']['direccion'] && data['cliente']['tipoOperacion'] != 4) {
+      if (data['cliente']['direccion']) {
         if (!data['cliente']['departamento']) {
           this.errors.push(
             'Obligatorio especificar el Departamento en data.cliente.departamento para Tipo de Documento != 4',
@@ -493,7 +461,7 @@ class JSonReciboValidateService {
           }
         }
       }
-    }
+    
 
     constanteService.validateDepartamentoDistritoCiudad(
       'data.cliente',
@@ -780,9 +748,15 @@ class JSonReciboValidateService {
    * @param options
    */
   public generateDatosDocumentosAsociadosValidate(params: any, data: any) {
-    for (let i = 0; i < data['documentosAsociados'].length; i++) {
-      this.generateDatosDocumentoAsociadoValidate(params, data['documentosAsociados'][i], i);
-    }
+    if (data['documentoAsociado']){
+      if (Array.isArray(data['documentoAsociado'])) {
+        for (let i = 0; i < data['documentoAsociado'].length; i++) {
+          this.generateDatosDocumentoAsociadoValidate(params, data['documentoAsociado'][i], i);
+        }
+      } else {
+        this.generateDatosDocumentoAsociadoValidate(params, data['documentoAsociado'], 0);
+      }
+    } 
   }
 
   /**
@@ -793,9 +767,6 @@ class JSonReciboValidateService {
    * @param options
    */
   public generateDatosDocumentoAsociadoValidate(params: any, documentoAsociado: any, i: number) {
-    if (documentoAsociado['tipoTransaccion'] == 11 && !documentoAsociado['resolucionCreditoFiscal']) {
-      this.errors.push('Obligatorio informar data.documentosAsociados[' + i + '].resolucionCreditoFiscal');
-    }
 
     //Validaciones
     if (
@@ -804,14 +775,13 @@ class JSonReciboValidateService {
       this.errors.push(
         "Formato de Documento Asociado '" +
           documentoAsociado['formato'] +
-          "' en data.documentosAsociados[" +
+          "' en data.documentoAsociado[" +
           i +
           '].formato no encontrado. Valores: ' +
           constanteService.tiposDocumentosAsociados.map((a) => a.codigo + '-' + a.descripcion),
       );
     }
 
-    if (documentoAsociado['tipo'] == 2) {
       if (
         constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
           .length == 0
@@ -819,71 +789,50 @@ class JSonReciboValidateService {
         this.errors.push(
           "Tipo de Documento impreso '" +
             documentoAsociado['tipoDocumentoImpreso'] +
-            "' en data.documentosAsociados[" +
+            "' en data.documentoAsociado[" +
             i +
             '].tipoDocumentoImpreso no encontrado. Valores: ' +
             constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
         );
       }
-    }
+    
 
-    if (documentoAsociado['formato'] == 1) {
       //H002 = Electronico
-      if (!(documentoAsociado['cdc'] && documentoAsociado['cdc'].length >= 44)) {
-        this.errors.push('Debe indicar el CDC asociado en data.documentosAsociados[' + i + '].cdc');
+      if (documentoAsociado['cdc']) {
+        if (documentoAsociado['cdc'].length != 44) {
+          this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
+        }
       }
-    }
 
-    /*  if (documentoAsociado['formato'] == 2) {
-      //H002 = Impreso
-      if (!documentoAsociado['timbrado']) {
-        this.errors.push(
-          'Debe especificar el Timbrado del Documento impreso Asociado en data.documentosAsociados[' + i + '].timbrado',
-        );
+      if (documentoAsociado['timbrado']) {
+        if (documentoAsociado['timbrado'].length != 8) {
+          this.errors.push('El Timbrado asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].timbrado');
+        }
+      } else {
+        this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
       }
+
       if (!documentoAsociado['establecimiento']) {
-        this.errors.push(
-          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentosAsociados[' +
-            i +
-            '].establecimiento',
-        );
+        this.errors.push('Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento');
       }
+
       if (!documentoAsociado['punto']) {
-        this.errors.push(
-          'Debe especificar el Punto del Documento impreso Asociado en data.documentosAsociados[' + i + '].punto',
-        );
+        this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
       }
 
       if (!documentoAsociado['numero']) {
-        this.errors.push(
-          'Debe especificar el Número del Documento impreso Asociado en data.documentosAsociados[' + i + '].numero',
-        );
-      }
-
-      if (!documentoAsociado['tipoDocumentoImpreso']) {
-        this.errors.push(
-          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentosAsociados[' +
-            i +
-            '].tipoDocumentoImpreso',
-        );
+        this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
       }
 
       if (documentoAsociado['fecha']) {
-        if ((documentoAsociado['fecha'] + '').length != 10) {
-          this.errors.push(
-            'La Fecha del Documento impreso Asociado en data.documentosAsociados[' +
-              i +
-              '].fecha debe tener una longitud de 10 caracteres',
-          );
+        if (documentoAsociado['fecha'].length != 10) {
+          this.errors.push('La Fecha del asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].fecha');
         }
       } else {
-        this.errors.push(
-          'Debe especificar la Fecha del Documento impreso Asociado en data.documentosAsociados[' + i + '].fecha',
-        );
+        this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
       }
+
     }
-    */
-  }
 }
 
 export default new JSonReciboValidateService();

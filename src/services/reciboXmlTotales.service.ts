@@ -14,9 +14,16 @@ class ReciboXmlTotalesService {
       moneda = 'PYG';
     }
 
-    let sumaMontos = 0;
-    for (let i = 0; i < data.documentosAsociados.length; i++) {
-      sumaMontos += parseFloat(data.documentosAsociados[i]['monto'].toFixed(config.decimals));
+    let sumaMontos = data.total;
+    if (data.documentoAsociado) {
+      if (Array.isArray(data.documentoAsociado)) {
+        for (let i = 0; i < data.documentoAsociado.length; i++) {
+          sumaMontos += parseFloat(data.documentoAsociado[i]['monto'].toFixed(config.decimals));
+        }  
+      } else {
+        sumaMontos += parseFloat(data.documentoAsociado['monto'].toFixed(config.decimals));
+      }
+  
     }
 
     let dTotOpe = sumaMontos,
@@ -55,7 +62,7 @@ class ReciboXmlTotalesService {
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
     } else {
-      dTotOpe = parseFloat(dTotOpe.toFixed(0));
+      dTotOpe = parseFloat(dTotOpe.toFixed(config.pygDecimals));
     }
 
     jsonResult = Object.assign(jsonResult, {
@@ -69,7 +76,7 @@ class ReciboXmlTotalesService {
 
     if (moneda != 'PYG' && data['condicionTipoCambio'] == 1) {
       //Por el Global
-      jsonResult['dTotalGs'] = parseFloat((dTotGralOpe * data['cambio']).toFixed(0));
+      jsonResult['dTotalGs'] = parseFloat((dTotGralOpe * data['cambio']).toFixed(config.pygDecimals));
     }
     if (moneda != 'PYG' && data['condicionTipoCambio'] == 2) {
       //Por item

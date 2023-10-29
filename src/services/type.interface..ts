@@ -5,6 +5,7 @@ interface XmlgenConfig {
   errorLimit?: number;
   redondeoSedeco?: boolean;
   decimals?: number;
+  pygDecimals?: number
 }
 
 export { XmlgenConfig };

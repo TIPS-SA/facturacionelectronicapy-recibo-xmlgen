@@ -23,8 +23,9 @@ class ReciboXmlMainService {
           //arrayValuesSeparator : ', ',
           errorSeparator: '; ',
           errorLimit: 10,
-          redondeoSedeco: true,
+//          redondeoSedeco: true,
           decimals: 2,
+          pygDecimals : 0
         };
 
         defaultConfig = Object.assign(defaultConfig, config);
@@ -72,7 +73,7 @@ class ReciboXmlMainService {
 
     this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config); //Marcos
 
-    if (data['documentosAsociados']) {
+    if (data['documentoAsociado']) {
       this.json['rDE']['recibo']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDocumentosAsociados(
         params,
         data,
@@ -239,11 +240,11 @@ class ReciboXmlMainService {
   private generateRte(params: any) {
     this.json = {
       rDE: {
-        $: {
+        /*$: {
           xmlns: 'http://ekuatia.set.gov.py/sifen/xsd',
           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
           'xsi:schemaLocation': 'http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd',
-        },
+        },*/
         dVerFor: params.version,
       },
     };

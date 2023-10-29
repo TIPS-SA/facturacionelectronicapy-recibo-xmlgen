@@ -5,8 +5,13 @@ import { XmlgenConfig } from './type.interface.';
 class JsonReciboDocumentoAsociadoService {
   public generateDocumentosAsociados(params: any, data: any, config: XmlgenConfig) {
     const jsonResult = new Array();
-    for (let i = 0; i < data.documentosAsociados.length; i++) {
-      const daResult = this.generateDocumentoAsociado(params, data.documentosAsociados[i], config);
+    if (Array.isArray(data.documentoAsociado)) {
+      for (let i = 0; i < data.documentoAsociado.length; i++) {
+        const daResult = this.generateDocumentoAsociado(params, data.documentoAsociado[i], config);
+        jsonResult.push(daResult);
+      }  
+    } else {
+      const daResult = this.generateDocumentoAsociado(params, data.documentoAsociado, config);
       jsonResult.push(daResult);
     }
     return jsonResult;
@@ -25,15 +30,11 @@ class JsonReciboDocumentoAsociadoService {
       )[0]['descripcion'],
     };
 
-    if (doumentoAsociado['formato'] == 1) {
       //H002 = Electronico
-      if (doumentoAsociado['cdc'] && doumentoAsociado['cdc'].length >= 44) {
+      if (doumentoAsociado['cdc']) {
         jsonResult['dCdCDERef'] = doumentoAsociado['cdc'];
-        /*} else {
-        throw new Error('Debe indicar el CDC asociado en data.documentoAsociado.cdc');*/
       }
-    }
-    if (doumentoAsociado['formato'] == 2) {
+    
       //H002 = Impreso
       if (doumentoAsociado['timbrado']) {
         jsonResult['dNTimDI'] = doumentoAsociado['timbrado'];
@@ -59,6 +60,11 @@ class JsonReciboDocumentoAsociadoService {
         /*} else {
         throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
       }
+      if (doumentoAsociado['serie']) {
+        jsonResult['dSerDocAso'] = doumentoAsociado['serie'];
+        /*} else {
+        throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
+      }
       if (doumentoAsociado['tipoDocumentoImpreso']) {
         jsonResult['iTipoDocAso'] = doumentoAsociado['tipoDocumentoImpreso'];
         jsonResult['dDTipoDocAso'] = constanteService.tiposDocumentosImpresos.filter(
@@ -79,7 +85,7 @@ class JsonReciboDocumentoAsociadoService {
         /*} else {
         throw new Error('Debe especificar la Fecha del Documento impreso Asociado en data.documentoAsociado.fecha');*/
       }
-    }
+    
     if (doumentoAsociado && doumentoAsociado['numeroRetencion'] && doumentoAsociado['numeroRetencion'].length >= 15) {
       jsonResult['dNumComRet'] = doumentoAsociado['numeroRetencion'].substring(0, 15);
     }
