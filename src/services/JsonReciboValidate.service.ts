@@ -58,7 +58,6 @@ class JSonReciboValidateService {
       }
     }
 
-
     this.generateDatosDocumentosAsociadosValidate(params, data);
 
     //Tratamiento Final, del Envio del Error, no tocar
@@ -395,73 +394,70 @@ class JSonReciboValidateService {
       }
     }
 
-      if (data['cliente']['ciudad']) {
+    if (data['cliente']['ciudad']) {
+      if (constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0) {
+        this.errors.push(
+          "Ciudad '" +
+            data['cliente']['ciudad'] +
+            "' del Cliente en data.cliente.ciudad no encontrado. Valores: " +
+            constanteService.ciudades.map((a: any) => a.codigo + '-' + a.descripcion),
+        );
+      }
+
+      //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
+      //valores de forma predeterminada, auque este valor sera sobre-escrito, caso el usuario envie
+      //data['cliente']['distrito'] y data['cliente']['departamento']
+      let objCiudad: any = constanteService.ciudades.filter((ciu) => ciu.codigo === +data['cliente']['ciudad']);
+
+      let objDistrito: any = constanteService.distritos.filter((dis) => dis.codigo === +objCiudad[0]['distrito']);
+
+      let objDepartamento: any = constanteService.distritos.filter(
+        (dep) => dep.codigo === +objDistrito[0]['departamento'],
+      );
+
+      data['cliente']['distrito'] = objDistrito[0]['codigo'];
+
+      data['cliente']['departamento'] = objDepartamento[0]['codigo'];
+    }
+
+    if (data['cliente']['direccion']) {
+      if (!data['cliente']['distrito']) {
+        this.errors.push('Obligatorio especificar el Distrito en data.cliente.distrito');
+      } else {
         if (
-          constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['cliente']['ciudad']).length == 0
+          constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito'])
+            .length == 0
         ) {
           this.errors.push(
-            "Ciudad '" +
-              data['cliente']['ciudad'] +
-              "' del Cliente en data.cliente.ciudad no encontrado. Valores: " +
-              constanteService.ciudades.map((a: any) => a.codigo + '-' + a.descripcion),
+            "Distrito '" +
+              data['cliente']['distrito'] +
+              "' del Cliente en data.cliente.distrito no encontrado. Valores: " +
+              constanteService.distritos.map((a: any) => a.codigo + '-' + a.descripcion),
           );
         }
+      }
+    }
 
-        //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
-        //valores de forma predeterminada, auque este valor sera sobre-escrito, caso el usuario envie
-        //data['cliente']['distrito'] y data['cliente']['departamento']
-        let objCiudad: any = constanteService.ciudades.filter((ciu) => ciu.codigo === +data['cliente']['ciudad']);
-
-        let objDistrito: any = constanteService.distritos.filter((dis) => dis.codigo === +objCiudad[0]['distrito']);
-
-        let objDepartamento: any = constanteService.distritos.filter(
-          (dep) => dep.codigo === +objDistrito[0]['departamento'],
+    if (data['cliente']['direccion']) {
+      if (!data['cliente']['departamento']) {
+        this.errors.push(
+          'Obligatorio especificar el Departamento en data.cliente.departamento para Tipo de Documento != 4',
         );
-
-        data['cliente']['distrito'] = objDistrito[0]['codigo'];
-
-        data['cliente']['departamento'] = objDepartamento[0]['codigo'];
-      }
-
-      if (data['cliente']['direccion'] ) {
-        if (!data['cliente']['distrito']) {
-          this.errors.push('Obligatorio especificar el Distrito en data.cliente.distrito');
-        } else {
-          if (
-            constanteService.distritos.filter((distrito: any) => distrito.codigo === +data['cliente']['distrito'])
-              .length == 0
-          ) {
-            this.errors.push(
-              "Distrito '" +
-                data['cliente']['distrito'] +
-                "' del Cliente en data.cliente.distrito no encontrado. Valores: " +
-                constanteService.distritos.map((a: any) => a.codigo + '-' + a.descripcion),
-            );
-          }
-        }
-      }
-
-      if (data['cliente']['direccion']) {
-        if (!data['cliente']['departamento']) {
+      } else {
+        if (
+          constanteService.departamentos.filter(
+            (departamento: any) => departamento.codigo === +data['cliente']['departamento'],
+          ).length == 0
+        ) {
           this.errors.push(
-            'Obligatorio especificar el Departamento en data.cliente.departamento para Tipo de Documento != 4',
+            "Departamento '" +
+              data['cliente']['departamento'] +
+              "' del Cliente en data.cliente.departamento no encontrado. Valores: " +
+              constanteService.departamentos.map((a: any) => a.codigo + '-' + a.descripcion),
           );
-        } else {
-          if (
-            constanteService.departamentos.filter(
-              (departamento: any) => departamento.codigo === +data['cliente']['departamento'],
-            ).length == 0
-          ) {
-            this.errors.push(
-              "Departamento '" +
-                data['cliente']['departamento'] +
-                "' del Cliente en data.cliente.departamento no encontrado. Valores: " +
-                constanteService.departamentos.map((a: any) => a.codigo + '-' + a.descripcion),
-            );
-          }
         }
       }
-    
+    }
 
     constanteService.validateDepartamentoDistritoCiudad(
       'data.cliente',
@@ -748,7 +744,7 @@ class JSonReciboValidateService {
    * @param options
    */
   public generateDatosDocumentosAsociadosValidate(params: any, data: any) {
-    if (data['documentoAsociado']){
+    if (data['documentoAsociado']) {
       if (Array.isArray(data['documentoAsociado'])) {
         for (let i = 0; i < data['documentoAsociado'].length; i++) {
           this.generateDatosDocumentoAsociadoValidate(params, data['documentoAsociado'][i], i);
@@ -756,7 +752,7 @@ class JSonReciboValidateService {
       } else {
         this.generateDatosDocumentoAsociadoValidate(params, data['documentoAsociado'], 0);
       }
-    } 
+    }
   }
 
   /**
@@ -767,7 +763,6 @@ class JSonReciboValidateService {
    * @param options
    */
   public generateDatosDocumentoAsociadoValidate(params: any, documentoAsociado: any, i: number) {
-
     //Validaciones
     if (
       constanteService.tiposDocumentosAsociados.filter((um) => um.codigo === documentoAsociado['formato']).length == 0
@@ -782,57 +777,57 @@ class JSonReciboValidateService {
       );
     }
 
-      if (
-        constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
-          .length == 0
-      ) {
-        this.errors.push(
-          "Tipo de Documento impreso '" +
-            documentoAsociado['tipoDocumentoImpreso'] +
-            "' en data.documentoAsociado[" +
-            i +
-            '].tipoDocumentoImpreso no encontrado. Valores: ' +
-            constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
-        );
-      }
-    
-
-      //H002 = Electronico
-      if (documentoAsociado['cdc']) {
-        if (documentoAsociado['cdc'].length != 44) {
-          this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
-        }
-      }
-
-      if (documentoAsociado['timbrado']) {
-        if (documentoAsociado['timbrado'].length != 8) {
-          this.errors.push('El Timbrado asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].timbrado');
-        }
-      } else {
-        this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
-      }
-
-      if (!documentoAsociado['establecimiento']) {
-        this.errors.push('Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento');
-      }
-
-      if (!documentoAsociado['punto']) {
-        this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
-      }
-
-      if (!documentoAsociado['numero']) {
-        this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
-      }
-
-      if (documentoAsociado['fecha']) {
-        if (documentoAsociado['fecha'].length != 10) {
-          this.errors.push('La Fecha del asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].fecha');
-        }
-      } else {
-        this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
-      }
-
+    if (
+      constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
+        .length == 0
+    ) {
+      this.errors.push(
+        "Tipo de Documento impreso '" +
+          documentoAsociado['tipoDocumentoImpreso'] +
+          "' en data.documentoAsociado[" +
+          i +
+          '].tipoDocumentoImpreso no encontrado. Valores: ' +
+          constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
+      );
     }
+
+    //H002 = Electronico
+    if (documentoAsociado['cdc']) {
+      if (documentoAsociado['cdc'].length != 44) {
+        this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
+      }
+    }
+
+    if (documentoAsociado['timbrado']) {
+      if (documentoAsociado['timbrado'].length != 8) {
+        this.errors.push('El Timbrado asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].timbrado');
+      }
+    } else {
+      this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
+    }
+
+    if (!documentoAsociado['establecimiento']) {
+      this.errors.push(
+        'Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento',
+      );
+    }
+
+    if (!documentoAsociado['punto']) {
+      this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
+    }
+
+    if (!documentoAsociado['numero']) {
+      this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
+    }
+
+    if (documentoAsociado['fecha']) {
+      if (documentoAsociado['fecha'].length != 10) {
+        this.errors.push('La Fecha del asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].fecha');
+      }
+    } else {
+      this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
+    }
+  }
 }
 
 export default new JSonReciboValidateService();

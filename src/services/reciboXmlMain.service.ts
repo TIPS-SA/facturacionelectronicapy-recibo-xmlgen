@@ -23,9 +23,9 @@ class ReciboXmlMainService {
           //arrayValuesSeparator : ', ',
           errorSeparator: '; ',
           errorLimit: 10,
-//          redondeoSedeco: true,
+          //          redondeoSedeco: true,
           decimals: 2,
-          pygDecimals : 0
+          pygDecimals: 0,
         };
 
         defaultConfig = Object.assign(defaultConfig, config);

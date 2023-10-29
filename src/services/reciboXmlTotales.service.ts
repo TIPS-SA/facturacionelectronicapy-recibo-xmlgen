@@ -19,11 +19,10 @@ class ReciboXmlTotalesService {
       if (Array.isArray(data.documentoAsociado)) {
         for (let i = 0; i < data.documentoAsociado.length; i++) {
           sumaMontos += parseFloat(data.documentoAsociado[i]['monto'].toFixed(config.decimals));
-        }  
+        }
       } else {
         sumaMontos += parseFloat(data.documentoAsociado['monto'].toFixed(config.decimals));
       }
-  
     }
 
     let dTotOpe = sumaMontos,
