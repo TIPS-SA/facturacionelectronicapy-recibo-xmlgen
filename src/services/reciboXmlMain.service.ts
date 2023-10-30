@@ -88,18 +88,17 @@ class ReciboXmlMainService {
       if (Array.isArray(this.json['rDE']['recibo']['gCamDEAsoc'])) {
         let arrayItems = new Array();
         for (let i = 0; i < this.json['rDE']['recibo']['gCamDEAsoc'].length; i++) {
-          arrayItems.push(i+1);
+          arrayItems.push(i + 1);
         }
         this.json['rDE']['recibo']['item'] = arrayItems;
       } else {
         this.json['rDE']['recibo']['item'] = 1;
       }
-  
     } else {
       //Si no hay documento Asociado si o si debe agregar un concepto.
       this.json['rDE']['recibo']['item'] = 1;
     }
-console.log("this.json['rDE']['recibo']['item']", this.json['rDE']['recibo']['item']);
+    console.log("this.json['rDE']['recibo']['item']", this.json['rDE']['recibo']['item']);
     var builder = new xml2js.Builder({
       xmldec: {
         version: '1.0',

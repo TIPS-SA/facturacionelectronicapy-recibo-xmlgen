@@ -59,15 +59,12 @@ class JSonReciboValidateService {
     }
 
     if (data['documentoAsociado']) {
-      this.generateDatosDocumentosAsociadosValidate(params, data);  
+      this.generateDatosDocumentosAsociadosValidate(params, data);
     } else {
       if (!data['concepto']) {
-        this.errors.push(
-          'Debe especificar el Concepto en data.concepto o especificar los Documentos Asociados',
-        );
+        this.errors.push('Debe especificar el Concepto en data.concepto o especificar los Documentos Asociados');
       }
     }
-    
 
     //Tratamiento Final, del Envio del Error, no tocar
     if (this.errors.length > 0) {
