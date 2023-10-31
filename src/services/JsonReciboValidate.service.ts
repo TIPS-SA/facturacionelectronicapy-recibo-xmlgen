@@ -524,28 +524,30 @@ class JSonReciboValidateService {
   }
 
   private generateDatosCondicionOperacionDEValidate(params: any, data: any) {
-    if (!data['condicion']) {
+    /*if (!data['condicion']) {
       this.errors.push('Debe indicar los datos de la Condición de la Operación en data.condicion');
       return; // sale metodo
-    }
+    }*/
 
-    if (
-      constanteService.condicionesOperaciones.filter((um: any) => um.codigo === data['condicion']['tipo']).length == 0
-    ) {
-      this.errors.push(
-        "Condición de la Operación '" +
-          data['condicion']['tipo'] +
-          "' en data.condicion.tipo no encontrado. Valores: " +
-          constanteService.condicionesOperaciones.map((a: any) => a.codigo + '-' + a.descripcion),
-      );
-    }
+    if (data['condicion']) {
+      if (
+        constanteService.condicionesOperaciones.filter((um: any) => um.codigo === data['condicion']['tipo']).length == 0
+      ) {
+        this.errors.push(
+          "Condición de la Operación '" +
+            data['condicion']['tipo'] +
+            "' en data.condicion.tipo no encontrado. Valores: " +
+            constanteService.condicionesOperaciones.map((a: any) => a.codigo + '-' + a.descripcion),
+        );
+      }
 
-    //if (data['condicion']['tipo'] === 1) {
-    this.generateDatosCondicionOperacionDE_ContadoValidate(params, data);
-    //}
+      //if (data['condicion']['tipo'] === 1) {
+      this.generateDatosCondicionOperacionDE_ContadoValidate(params, data);
+      //}
 
-    if (data['condicion']['tipo'] === 2) {
-      this.generateDatosCondicionOperacionDE_CreditoValidate(params, data);
+      if (data['condicion']['tipo'] === 2) {
+        this.generateDatosCondicionOperacionDE_CreditoValidate(params, data);
+      }
     }
   }
 

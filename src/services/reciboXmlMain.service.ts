@@ -69,7 +69,9 @@ class ReciboXmlMainService {
       this.json['rDE']['recibo']['gDtipDE'] = {};
     }
 
-    this.generateDatosCondicionOperacionDE(params, data);
+    if (data['condicion'] && data['condicion']['tipo']) {
+      this.generateDatosCondicionOperacionDE(params, data);
+    }
 
     this.json['rDE']['recibo']['gTotSub'] = reciboXmlTotales.generateDatosTotalesRecibo(params, data, config); //Marcos
 
