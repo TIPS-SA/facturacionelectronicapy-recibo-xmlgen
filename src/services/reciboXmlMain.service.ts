@@ -546,7 +546,7 @@ class ReciboXmlMainService {
         data['cliente']['ruc'].split('-')[1] + ''
       ).trim();
     }
-    
+
     if (!data['cliente']['contribuyente']) {
       //Obligatorio completar D210
 
