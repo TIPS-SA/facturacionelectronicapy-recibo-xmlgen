@@ -337,7 +337,7 @@ class JSonReciboValidateService {
       return; //El error de cliente vacio, ya fue validado arriba
     }
 
-    if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
+    if (!data['cliente']['contribuyente']) {
       if (
         constanteService.tiposDocumentosReceptor.filter((um: any) => um.codigo === data['cliente']['documentoTipo'])
           .length == 0
