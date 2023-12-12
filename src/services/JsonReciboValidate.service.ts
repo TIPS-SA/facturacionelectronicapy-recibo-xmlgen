@@ -808,7 +808,7 @@ class JSonReciboValidateService {
 
     if (documentoAsociado['timbrado']) {
       if (documentoAsociado['timbrado'].length != 8) {
-        this.errors.push('El Timbrado asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].timbrado');
+        this.errors.push('El Timbrado asociado debe tener 8 digitos en data.documentoAsociado[' + i + '].timbrado');
       }
     } else {
       this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
@@ -830,7 +830,7 @@ class JSonReciboValidateService {
 
     if (documentoAsociado['fecha']) {
       if (documentoAsociado['fecha'].length != 10) {
-        this.errors.push('La Fecha del asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].fecha');
+        this.errors.push('La Fecha del asociado debe tener 10 digitos en data.documentoAsociado[' + i + '].fecha');
       }
     } else {
       this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
