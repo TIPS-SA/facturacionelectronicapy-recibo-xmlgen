@@ -14,20 +14,23 @@ class ReciboXmlTotalesService {
       moneda = 'PYG';
     }
 
-    let sumaMontos = data.total;
+    let sumaMontos = +data.total;
     if (data.documentoAsociado) {
       if (Array.isArray(data.documentoAsociado)) {
         for (let i = 0; i < data.documentoAsociado.length; i++) {
-          sumaMontos += parseFloat(data.documentoAsociado[i]['monto'].toFixed(config.decimals));
+          let montoNumerico = +data.documentoAsociado[i]['monto'];
+          sumaMontos += parseFloat(montoNumerico.toFixed(config.decimals));
         }
       } else {
-        sumaMontos += parseFloat(data.documentoAsociado['monto'].toFixed(config.decimals));
+        let montoNumerico = +data.documentoAsociado['monto'];
+        sumaMontos += parseFloat(montoNumerico.toFixed(config.decimals));
       }
     }
 
     let dTotOpe = sumaMontos,
       dTotOpeGs = 0;
 
+    console.log("dTotOpe", dTotOpe);
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
     }

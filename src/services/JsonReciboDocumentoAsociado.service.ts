@@ -97,7 +97,8 @@ class JsonReciboDocumentoAsociadoService {
       jsonResult['dNumResCF'] = doumentoAsociado['resolucionCreditoFiscal'].substring(0, 15);
     }
 
-    jsonResult['monto'] = parseFloat(doumentoAsociado['monto'].toFixed(config.decimals));
+    let montoNumerico = +doumentoAsociado['monto'];
+    jsonResult['monto'] = parseFloat(montoNumerico.toFixed(config.decimals));
 
     return jsonResult;
   }
