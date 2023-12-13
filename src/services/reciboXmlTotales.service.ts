@@ -30,7 +30,7 @@ class ReciboXmlTotalesService {
     let dTotOpe = sumaMontos,
       dTotOpeGs = 0;
 
-    console.log("dTotOpe", dTotOpe);
+    console.log('dTotOpe', dTotOpe);
     if (data.moneda != 'PYG') {
       dTotOpe = parseFloat(dTotOpe.toFixed(config.decimals));
     }
