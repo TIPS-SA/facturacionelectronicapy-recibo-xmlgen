@@ -359,23 +359,23 @@ class JSonReciboValidateService {
         if (data['cliente']['ruc'].indexOf('-') == -1) {
           this.errors.push('RUC debe contener dígito verificador en data.cliente.ruc');
         }
-  
+
         const rucCliente = data['cliente']['ruc'].split('-');
-  
+
         if (!regExpOnlyNumber.test((rucCliente[0] + '').trim())) {
           this.errors.push("El RUC del Cliente '" + rucCliente[0] + "' en data.cliente.ruc debe ser numérico");
         }
         if (!regExpOnlyNumber.test((rucCliente[1] + '').trim())) {
           this.errors.push("El DV del RUC del Cliente '" + rucCliente[1] + "' en data.cliente.ruc debe ser numérico");
         }
-  
+
         if (rucCliente[0].length > 8) {
           this.errors.push("El RUC '" + rucCliente[0] + "' debe contener de 1 a 8 caracteres");
         }
-  
+
         if (rucCliente[1] > 9) {
           this.errors.push("El DV del RUC '" + rucCliente[1] + "' debe ser del 1 al 9");
-        }  
+        }
       }
     }
 
