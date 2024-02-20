@@ -16,6 +16,7 @@ class ReciboXmlTotalesService {
 
     let sumaMontos = +data.total;
     if (data.documentoAsociado) {
+      sumaMontos = 0;
       if (Array.isArray(data.documentoAsociado)) {
         for (let i = 0; i < data.documentoAsociado.length; i++) {
           let montoNumerico = +data.documentoAsociado[i]['monto'];
