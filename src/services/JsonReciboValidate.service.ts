@@ -784,58 +784,70 @@ class JSonReciboValidateService {
           '].formato no encontrado. Valores: ' +
           constanteService.tiposDocumentosAsociados.map((a) => a.codigo + '-' + a.descripcion),
       );
-    }
-
-    if (
-      constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
-        .length == 0
-    ) {
-      this.errors.push(
-        "Tipo de Documento impreso '" +
-          documentoAsociado['tipoDocumentoImpreso'] +
-          "' en data.documentoAsociado[" +
-          i +
-          '].tipoDocumentoImpreso no encontrado. Valores: ' +
-          constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
-      );
-    }
-
-    //H002 = Electronico
-    if (documentoAsociado['cdc']) {
-      if (documentoAsociado['cdc'].length != 44) {
-        this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
-      }
-    }
-
-    if (documentoAsociado['timbrado']) {
-      if (documentoAsociado['timbrado'].length != 8) {
-        this.errors.push('El Timbrado asociado debe tener 8 digitos en data.documentoAsociado[' + i + '].timbrado');
-      }
     } else {
-      this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
-    }
+      //Si ya tiene formato
+      if (+documentoAsociado['formato'] == 1) {
+        //H002 = Electronico
+        if (documentoAsociado['cdc']) {
+          if (documentoAsociado['cdc'].length != 44) {
+            this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
+          }
+        }
 
-    if (!documentoAsociado['establecimiento']) {
-      this.errors.push(
-        'Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento',
-      );
-    }
-
-    if (!documentoAsociado['punto']) {
-      this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
-    }
-
-    if (!documentoAsociado['numero']) {
-      this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
-    }
-
-    if (documentoAsociado['fecha']) {
-      if (documentoAsociado['fecha'].length != 10) {
-        this.errors.push('La Fecha del asociado debe tener 10 digitos en data.documentoAsociado[' + i + '].fecha');
       }
-    } else {
-      this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
+
+      if (+documentoAsociado['formato'] == 2) {
+        if (
+          constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
+            .length == 0
+        ) {
+          this.errors.push(
+            "Tipo de Documento impreso '" +
+              documentoAsociado['tipoDocumentoImpreso'] +
+              "' en data.documentoAsociado[" +
+              i +
+              '].tipoDocumentoImpreso no encontrado. Valores: ' +
+              constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
+          );
+        }
+  
+        if (documentoAsociado['timbrado']) {
+          if (documentoAsociado['timbrado'].length != 8) {
+            this.errors.push('El Timbrado asociado debe tener 8 digitos en data.documentoAsociado[' + i + '].timbrado');
+          }
+        } else {
+          this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
+        }
+    
+        if (!documentoAsociado['establecimiento']) {
+          this.errors.push(
+            'Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento',
+          );
+        }
+    
+        if (!documentoAsociado['punto']) {
+          this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
+        }
+    
+        if (!documentoAsociado['numero']) {
+          this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
+        }
+    
+        if (documentoAsociado['fecha']) {
+          if (documentoAsociado['fecha'].length != 10) {
+            this.errors.push('La Fecha del asociado debe tener 10 digitos en data.documentoAsociado[' + i + '].fecha');
+          }
+        } else {
+          this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
+        }
+  
+      }
+
+  
+  
+  
     }
+
   }
 }
 
