@@ -793,13 +793,13 @@ class JSonReciboValidateService {
             this.errors.push('El CDC asociado debe tener 44 digitos en data.documentoAsociado[' + i + '].cdc');
           }
         }
-
       }
 
       if (+documentoAsociado['formato'] == 2) {
         if (
-          constanteService.tiposDocumentosImpresos.filter((um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'])
-            .length == 0
+          constanteService.tiposDocumentosImpresos.filter(
+            (um) => um.codigo === documentoAsociado['tipoDocumentoImpreso'],
+          ).length == 0
         ) {
           this.errors.push(
             "Tipo de Documento impreso '" +
@@ -810,7 +810,7 @@ class JSonReciboValidateService {
               constanteService.tiposDocumentosImpresos.map((a) => a.codigo + '-' + a.descripcion),
           );
         }
-  
+
         if (documentoAsociado['timbrado']) {
           if (documentoAsociado['timbrado'].length != 8) {
             this.errors.push('El Timbrado asociado debe tener 8 digitos en data.documentoAsociado[' + i + '].timbrado');
@@ -818,21 +818,21 @@ class JSonReciboValidateService {
         } else {
           this.errors.push('Debe especificar el Timbrado asociado en data.documentoAsociado[' + i + '].timbrado');
         }
-    
+
         if (!documentoAsociado['establecimiento']) {
           this.errors.push(
             'Debe especificar el Establecimiento asociado en data.documentoAsociado[' + i + '].establecimiento',
           );
         }
-    
+
         if (!documentoAsociado['punto']) {
           this.errors.push('Debe especificar el Punto asociado en data.documentoAsociado[' + i + '].punto');
         }
-    
+
         if (!documentoAsociado['numero']) {
           this.errors.push('Debe especificar el Numero asociado en data.documentoAsociado[' + i + '].numero');
         }
-    
+
         if (documentoAsociado['fecha']) {
           if (documentoAsociado['fecha'].length != 10) {
             this.errors.push('La Fecha del asociado debe tener 10 digitos en data.documentoAsociado[' + i + '].fecha');
@@ -840,14 +840,8 @@ class JSonReciboValidateService {
         } else {
           this.errors.push('Debe especificar La Fecha del asociado en data.documentoAsociado[' + i + '].fecha');
         }
-  
       }
-
-  
-  
-  
     }
-
   }
 }
 
