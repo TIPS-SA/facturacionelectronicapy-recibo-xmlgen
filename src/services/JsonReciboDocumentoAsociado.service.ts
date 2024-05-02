@@ -110,7 +110,6 @@ class JsonReciboDocumentoAsociadoService {
     let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
     jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
 
-
     return jsonResult;
   }
 }
