@@ -16,6 +16,7 @@ class JsonReciboDocumentoAsociadoService {
     }
     return jsonResult;
   }
+
   /**
    *
    * @param params
@@ -30,75 +31,85 @@ class JsonReciboDocumentoAsociadoService {
       )[0]['descripcion'],
     };
 
-    //H002 = Electronico
-    if (doumentoAsociado['cdc']) {
-      jsonResult['dCdCDERef'] = doumentoAsociado['cdc'];
+    if (doumentoAsociado['formato'] == 1) {
+      //H002 = Electronico
+      if (doumentoAsociado['cdc']) {
+        jsonResult['dCdCDERef'] = doumentoAsociado['cdc'];
+      }
     }
 
-    //H002 = Impreso
-    if (doumentoAsociado['timbrado']) {
-      jsonResult['dNTimDI'] = doumentoAsociado['timbrado'];
-      /*} else {
-        throw new Error(
-          'Debe especificar el Timbrado del Documento impreso Asociado en data.documentoAsociado.timbrado',
-        );*/
-    }
-    if (doumentoAsociado['establecimiento']) {
-      jsonResult['dEstDocAso'] = stringUtilService.leftZero(doumentoAsociado['establecimiento'] + '', 3);
-      /*} else {
-        throw new Error(
-          'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentoAsociado.establecimiento',
-        );*/
-    }
-    if (doumentoAsociado['punto']) {
-      jsonResult['dPExpDocAso'] = stringUtilService.leftZero(doumentoAsociado['punto'] + '', 3);
-      /*} else {
-        throw new Error('Debe especificar el Punto del Documento impreso Asociado en data.documentoAsociado.punto');*/
-    }
-    if (doumentoAsociado['numero']) {
-      jsonResult['dNumDocAso'] = stringUtilService.leftZero(doumentoAsociado['numero'] + '', 7);
-      /*} else {
-        throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
-    }
-    if (doumentoAsociado['serie']) {
-      jsonResult['dSerDocAso'] = doumentoAsociado['serie'];
-      /*} else {
-        throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
-    }
-    if (doumentoAsociado['tipoDocumentoImpreso']) {
-      jsonResult['iTipoDocAso'] = doumentoAsociado['tipoDocumentoImpreso'];
-      jsonResult['dDTipoDocAso'] = constanteService.tiposDocumentosImpresos.filter(
-        (td) => td.codigo === doumentoAsociado['tipoDocumentoImpreso'],
-      )[0]['descripcion'];
-      /*} else {
-        throw new Error(
-          'Debe especificar el Tipo del Documento Impreso Asociado en data.documentoAsociado.tipoDocumentoImpreso',
-        );*/
-    }
-    if (doumentoAsociado['fecha']) {
-      /*if ((data['fecha'] + '').length != 10) {
+    if (doumentoAsociado['formato'] == 2) {
+      //H002 = Impreso
+      if (doumentoAsociado['timbrado']) {
+        jsonResult['dNTimDI'] = doumentoAsociado['timbrado'];
+        /*} else {
           throw new Error(
-            'La Fecha del Documento impreso Asociado en data.documentoAsociado.fecha debe tener una longitud de 10 caracteres',
-          );
-        }*/
-      jsonResult['dFecEmiDI'] = doumentoAsociado['fecha'];
-      /*} else {
-        throw new Error('Debe especificar la Fecha del Documento impreso Asociado en data.documentoAsociado.fecha');*/
-    }
+            'Debe especificar el Timbrado del Documento impreso Asociado en data.documentoAsociado.timbrado',
+          );*/
+      }
+      if (doumentoAsociado['establecimiento']) {
+        jsonResult['dEstDocAso'] = stringUtilService.leftZero(doumentoAsociado['establecimiento'] + '', 3);
+        /*} else {
+          throw new Error(
+            'Debe especificar el Establecimiento del Documento impreso Asociado en data.documentoAsociado.establecimiento',
+          );*/
+      }
+      if (doumentoAsociado['punto']) {
+        jsonResult['dPExpDocAso'] = stringUtilService.leftZero(doumentoAsociado['punto'] + '', 3);
+        /*} else {
+          throw new Error('Debe especificar el Punto del Documento impreso Asociado en data.documentoAsociado.punto');*/
+      }
+      if (doumentoAsociado['numero']) {
+        jsonResult['dNumDocAso'] = stringUtilService.leftZero(doumentoAsociado['numero'] + '', 7);
+        /*} else {
+          throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
+      }
+      if (doumentoAsociado['serie']) {
+        jsonResult['dSerDocAso'] = doumentoAsociado['serie'];
+        /*} else {
+          throw new Error('Debe especificar el Número del Documento impreso Asociado en data.documentoAsociado.numero');*/
+      }
+      if (doumentoAsociado['tipoDocumentoImpreso']) {
+        jsonResult['iTipoDocAso'] = doumentoAsociado['tipoDocumentoImpreso'];
+        jsonResult['dDTipoDocAso'] = constanteService.tiposDocumentosImpresos.filter(
+          (td) => td.codigo === doumentoAsociado['tipoDocumentoImpreso'],
+        )[0]['descripcion'];
+        /*} else {
+          throw new Error(
+            'Debe especificar el Tipo del Documento Impreso Asociado en data.documentoAsociado.tipoDocumentoImpreso',
+          );*/
+      }
+      if (doumentoAsociado['fecha']) {
+        /*if ((data['fecha'] + '').length != 10) {
+            throw new Error(
+              'La Fecha del Documento impreso Asociado en data.documentoAsociado.fecha debe tener una longitud de 10 caracteres',
+            );
+          }*/
+        jsonResult['dFecEmiDI'] = doumentoAsociado['fecha'];
+        /*} else {
+          throw new Error('Debe especificar la Fecha del Documento impreso Asociado en data.documentoAsociado.fecha');*/
+      }
 
-    if (doumentoAsociado && doumentoAsociado['numeroRetencion'] && doumentoAsociado['numeroRetencion'].length >= 15) {
-      jsonResult['dNumComRet'] = doumentoAsociado['numeroRetencion'].substring(0, 15);
+      if (doumentoAsociado && doumentoAsociado['numeroRetencion'] && doumentoAsociado['numeroRetencion'].length >= 15) {
+        jsonResult['dNumComRet'] = doumentoAsociado['numeroRetencion'].substring(0, 15);
+      }
+      if (
+        doumentoAsociado &&
+        doumentoAsociado['resolucionCreditoFiscal'] &&
+        doumentoAsociado['resolucionCreditoFiscal'].length >= 15
+      ) {
+        jsonResult['dNumResCF'] = doumentoAsociado['resolucionCreditoFiscal'].substring(0, 15);
+      }
     }
-    if (
-      doumentoAsociado &&
-      doumentoAsociado['resolucionCreditoFiscal'] &&
-      doumentoAsociado['resolucionCreditoFiscal'].length >= 15
-    ) {
-      jsonResult['dNumResCF'] = doumentoAsociado['resolucionCreditoFiscal'].substring(0, 15);
-    }
-
     let montoNumerico = +doumentoAsociado['monto'];
     jsonResult['monto'] = parseFloat(montoNumerico.toFixed(config.decimals));
+
+    let montoRetencionIva = +doumentoAsociado['montoRetencionIva'];
+    jsonResult['montoRetencionIva'] = parseFloat(montoRetencionIva.toFixed(config.decimals));
+
+    let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
+    jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+
 
     return jsonResult;
   }
