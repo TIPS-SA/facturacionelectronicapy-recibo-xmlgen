@@ -204,6 +204,44 @@ class ReciboXmlMainService {
       data.usuario.documentoNumero = data.usuario.documento_numero;
     }
 
+    //Documento Asociado
+    if (data.documento_asociado) {
+      data.documentoAsociado = { ...data.documento_asociado };
+    }
+
+    if (data.documentoAsociado?.numero_retencion) {
+      data.documentoAsociado.numeroRetencion = data.documentoAsociado.numero_retencion;
+    }
+
+    if (data.documentoAsociado?.resolucion_credito_fiscal) {
+      data.documentoAsociado.resolucionCreditoFiscal = data.documentoAsociado.resolucion_credito_fiscal;
+    }
+
+    if (data.documentoAsociado?.tipo_documento_impreso) {
+      data.documentoAsociado.tipoDocumentoImpreso = data.documentoAsociado.tipo_documento_impreso;
+    }
+
+    if (data.documentoAsociado?.constancia_tipo) {
+      data.documentoAsociado.constanciaTipo = data.documentoAsociado.constancia_tipo;
+    }
+
+    if (data.documentoAsociado?.constancia_numero) {
+      data.documentoAsociado.constanciaNumero = data.documentoAsociado.constancia_numero;
+    }
+
+    if (data.documentoAsociado?.constancia_control) {
+      data.documentoAsociado.constanciaControl = data.documentoAsociado.constancia_control;
+    }
+
+    if (data.documentoAsociado?.monto_retencion_iva) {
+      data.documentoAsociado.montoRetencionIva = data.documentoAsociado.monto_retencion_iva;
+    }
+
+    if (data.documentoAsociado?.monto_retencion_renta) {
+      data.documentoAsociado.montoRetencionRenta = data.documentoAsociado.monto_retencion_renta;
+    }
+
+
     //Condicion entregas
     if (data.condicion?.entregas && data.condicion?.entregas.length > 0) {
       for (let i = 0; i < data.condicion.entregas.length; i++) {
