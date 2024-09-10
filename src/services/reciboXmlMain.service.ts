@@ -241,6 +241,10 @@ class ReciboXmlMainService {
       data.documentoAsociado.montoRetencionRenta = data.documentoAsociado.monto_retencion_renta;
     }
 
+    if (data.documentoAsociado?.ruc_fusionado) {
+      data.documentoAsociado.rucFusionado = data.documentoAsociado.ruc_fusionado;
+    }
+
     //Condicion entregas
     if (data.condicion?.entregas && data.condicion?.entregas.length > 0) {
       for (let i = 0; i < data.condicion.entregas.length; i++) {
