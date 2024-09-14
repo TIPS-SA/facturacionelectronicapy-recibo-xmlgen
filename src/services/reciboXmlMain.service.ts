@@ -87,7 +87,10 @@ class ReciboXmlMainService {
       );
 
       //
-      if (Array.isArray(this.json['rDE']['recibo']['gCamDEAsoc']) && this.json['rDE']['recibo']['gCamDEAsoc'].length > 0) {
+      if (
+        Array.isArray(this.json['rDE']['recibo']['gCamDEAsoc']) &&
+        this.json['rDE']['recibo']['gCamDEAsoc'].length > 0
+      ) {
         let arrayItems = new Array();
         for (let i = 0; i < this.json['rDE']['recibo']['gCamDEAsoc'].length; i++) {
           arrayItems.push(i + 1);
