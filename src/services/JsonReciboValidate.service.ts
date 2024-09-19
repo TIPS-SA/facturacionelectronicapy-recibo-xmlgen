@@ -812,7 +812,7 @@ class JSonReciboValidateService {
         }
 
         if (documentoAsociado['timbrado']) {
-          if (documentoAsociado['timbrado'].length != 8) {
+          if ((documentoAsociado['timbrado']+'').length != 8) {
             this.errors.push('El Timbrado asociado debe tener 8 digitos en data.documentoAsociado[' + i + '].timbrado');
           }
         } else {

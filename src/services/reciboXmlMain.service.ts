@@ -209,43 +209,67 @@ class ReciboXmlMainService {
 
     //Documento Asociado
     if (data.documento_asociado) {
-      data.documentoAsociado = { ...data.documento_asociado };
+      /*if (!Array.isArray(data.documento_asociado)) {
+        data.documentoAsociado = [...data.documento_asociado ];
+      } else {
+        data.documentoAsociado = [ ...data.documento_asociado ];
+      }*/
+      data.documentoAsociado = [ ...data.documento_asociado ];
     }
 
-    if (data.documentoAsociado?.numero_retencion) {
-      data.documentoAsociado.numeroRetencion = data.documentoAsociado.numero_retencion;
+    if (data.documentoAsociado && Array.isArray(data.documentoAsociado)) {  
+      for(let i=0; i < data.documentoAsociado.length; i++) {
+        let docAso = data.documentoAsociado[i];
+
+        if (docAso.numero_retencion) {
+          docAso.numeroRetencion = docAso.numero_retencion;
+          delete docAso.numero_retencion;
+        }
+    
+        if (docAso.resolucion_credito_fiscal) {
+          docAso.resolucionCreditoFiscal = docAso.resolucion_credito_fiscal;
+          delete docAso.resolucion_credito_fiscal;
+        }
+    
+        if (docAso.tipo_documento_impreso) {
+          docAso.tipoDocumentoImpreso = docAso.tipo_documento_impreso;
+          delete docAso.tipo_documento_impreso;
+        }
+    
+        if (docAso.constancia_tipo) {
+          docAso.constanciaTipo = docAso.constancia_tipo;
+          delete docAso.constancia_tipo;
+        }
+    
+        if (docAso.constancia_numero) {
+          docAso.constanciaNumero = docAso.constancia_numero;
+          delete docAso.constancia_numero;
+        }
+    
+        if (docAso.constancia_control) {
+          docAso.constanciaControl = docAso.constancia_control;
+          delete docAso.constancia_control;
+        }
+    
+        if (typeof docAso.monto_retencion_iva != 'undefined') {
+          docAso.montoRetencionIva = docAso.monto_retencion_iva;
+          delete docAso.monto_retencion_iva;
+        }
+    
+        if (typeof docAso.monto_retencion_renta != 'undefined') {
+          docAso.montoRetencionRenta = docAso.monto_retencion_renta;
+          delete docAso.monto_retencion_renta;
+        }
+    
+        if (docAso.ruc_fusionado) {
+          docAso.rucFusionado = docAso.ruc_fusionado;
+          delete docAso.ruc_fusionado;
+        }
+      }
     }
 
-    if (data.documentoAsociado?.resolucion_credito_fiscal) {
-      data.documentoAsociado.resolucionCreditoFiscal = data.documentoAsociado.resolucion_credito_fiscal;
-    }
-
-    if (data.documentoAsociado?.tipo_documento_impreso) {
-      data.documentoAsociado.tipoDocumentoImpreso = data.documentoAsociado.tipo_documento_impreso;
-    }
-
-    if (data.documentoAsociado?.constancia_tipo) {
-      data.documentoAsociado.constanciaTipo = data.documentoAsociado.constancia_tipo;
-    }
-
-    if (data.documentoAsociado?.constancia_numero) {
-      data.documentoAsociado.constanciaNumero = data.documentoAsociado.constancia_numero;
-    }
-
-    if (data.documentoAsociado?.constancia_control) {
-      data.documentoAsociado.constanciaControl = data.documentoAsociado.constancia_control;
-    }
-
-    if (data.documentoAsociado?.monto_retencion_iva) {
-      data.documentoAsociado.montoRetencionIva = data.documentoAsociado.monto_retencion_iva;
-    }
-
-    if (data.documentoAsociado?.monto_retencion_renta) {
-      data.documentoAsociado.montoRetencionRenta = data.documentoAsociado.monto_retencion_renta;
-    }
-
-    if (data.documentoAsociado?.ruc_fusionado) {
-      data.documentoAsociado.rucFusionado = data.documentoAsociado.ruc_fusionado;
+    if (data.documento_asociado) {
+      delete data.documento_asociado;
     }
 
     //Condicion entregas
