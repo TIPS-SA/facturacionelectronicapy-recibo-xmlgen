@@ -214,53 +214,53 @@ class ReciboXmlMainService {
       } else {
         data.documentoAsociado = [ ...data.documento_asociado ];
       }*/
-      data.documentoAsociado = [ ...data.documento_asociado ];
+      data.documentoAsociado = [...data.documento_asociado];
     }
 
-    if (data.documentoAsociado && Array.isArray(data.documentoAsociado)) {  
-      for(let i=0; i < data.documentoAsociado.length; i++) {
+    if (data.documentoAsociado && Array.isArray(data.documentoAsociado)) {
+      for (let i = 0; i < data.documentoAsociado.length; i++) {
         let docAso = data.documentoAsociado[i];
 
         if (docAso.numero_retencion) {
           docAso.numeroRetencion = docAso.numero_retencion;
           delete docAso.numero_retencion;
         }
-    
+
         if (docAso.resolucion_credito_fiscal) {
           docAso.resolucionCreditoFiscal = docAso.resolucion_credito_fiscal;
           delete docAso.resolucion_credito_fiscal;
         }
-    
+
         if (docAso.tipo_documento_impreso) {
           docAso.tipoDocumentoImpreso = docAso.tipo_documento_impreso;
           delete docAso.tipo_documento_impreso;
         }
-    
+
         if (docAso.constancia_tipo) {
           docAso.constanciaTipo = docAso.constancia_tipo;
           delete docAso.constancia_tipo;
         }
-    
+
         if (docAso.constancia_numero) {
           docAso.constanciaNumero = docAso.constancia_numero;
           delete docAso.constancia_numero;
         }
-    
+
         if (docAso.constancia_control) {
           docAso.constanciaControl = docAso.constancia_control;
           delete docAso.constancia_control;
         }
-    
+
         if (typeof docAso.monto_retencion_iva != 'undefined') {
           docAso.montoRetencionIva = docAso.monto_retencion_iva;
           delete docAso.monto_retencion_iva;
         }
-    
+
         if (typeof docAso.monto_retencion_renta != 'undefined') {
           docAso.montoRetencionRenta = docAso.monto_retencion_renta;
           delete docAso.monto_retencion_renta;
         }
-    
+
         if (docAso.ruc_fusionado) {
           docAso.rucFusionado = docAso.ruc_fusionado;
           delete docAso.ruc_fusionado;
