@@ -104,11 +104,18 @@ class JsonReciboDocumentoAsociadoService {
     let montoNumerico = +doumentoAsociado['monto'];
     jsonResult['monto'] = parseFloat(montoNumerico.toFixed(config.decimals));
 
-    let montoRetencionIva = +doumentoAsociado['montoRetencionIva'];
-    jsonResult['montoRetencionIva'] = parseFloat(montoRetencionIva.toFixed(config.decimals));
+    jsonResult['montoRetencionIva'] = 0;
+    jsonResult['montoRetencionRenta'] = 0;
 
-    let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
-    jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+    if (typeof doumentoAsociado['montoRetencionIva'] != 'undefined') {
+      let montoRetencionIva = +doumentoAsociado['montoRetencionIva'];
+      jsonResult['montoRetencionIva'] = parseFloat(montoRetencionIva.toFixed(config.decimals));
+    }
+
+    if (typeof doumentoAsociado['montoRetencionRenta'] != 'undefined') {
+      let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
+      jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+    }
 
     return jsonResult;
   }
