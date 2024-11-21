@@ -109,12 +109,16 @@ class JsonReciboDocumentoAsociadoService {
 
     if (typeof doumentoAsociado['montoRetencionIva'] != 'undefined') {
       let montoRetencionIva = +doumentoAsociado['montoRetencionIva'];
-      jsonResult['montoRetencionIva'] = parseFloat(montoRetencionIva.toFixed(config.decimals));
+      if (montoRetencionIva > 0) {
+        jsonResult['montoRetencionIva'] = parseFloat(montoRetencionIva.toFixed(config.decimals));
+      }
     }
 
     if (typeof doumentoAsociado['montoRetencionRenta'] != 'undefined') {
       let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
-      jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+      if (montoRetencionRenta > 0) {
+        jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+      }
     }
 
     return jsonResult;
