@@ -1,7 +1,7 @@
 {
   "name": "facturacionelectronicapy-recibo-xmlgen",
   "version": "1.0.21",
-  "description": "API Node JS para generar el archivo XML del Recibo similar al exigido por la SET en base a JSON",
+  "description": "API Node JS para generar el archivo XML del Recibo similar al exigido por SIFEN en base a JSON",
   "main": "dist/index.js",
   "scripts": {
     "start": "nodemon --config nodemon.json ./app.ts",
