@@ -486,11 +486,7 @@ class JSonReciboValidateService {
 
     const validateNumeroCelular = (celular: any, errors: any) => {
       if (!(celular.length >= 10 && celular.length <= 20)) {
-        errors.push(
-          "El valor '" +
-            celular +
-            "' en data.cliente.celular debe tener una longitud de 10 a 20 caracteres",
-        );
+        errors.push("El valor '" + celular + "' en data.cliente.celular debe tener una longitud de 10 a 20 caracteres");
       } else {
         if (
           (celular + '').includes('(') ||
@@ -502,18 +498,16 @@ class JSonReciboValidateService {
           (celular + '').includes('/') ||
           (celular + '').includes('\\')
         ) {
-          errors.push(
-            "El valor '" + celular + "' en data.cliente.celular no puede contener (), [] o ;",
-          );
+          errors.push("El valor '" + celular + "' en data.cliente.celular no puede contener (), [] o ;");
         }
       }
-    }
+    };
 
     if (data['cliente']['celular']) {
       //Primero verificar si el celular tiene comas
       if ((data['cliente']['celular'] + '').includes(',')) {
-        let celulares = data['cliente']['celular'].split(",");
-        for(let i=0; i< celulares.lenght; i++) {
+        let celulares = data['cliente']['celular'].split(',');
+        for (let i = 0; i < celulares.lenght; i++) {
           validateNumeroCelular(celulares[i], this.errors);
         }
       } else {
