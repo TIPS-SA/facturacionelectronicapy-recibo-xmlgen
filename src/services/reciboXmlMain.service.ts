@@ -680,7 +680,13 @@ class ReciboXmlMainService {
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dTelRec = data['cliente']['telefono'].trim();
     }
     if (data['cliente']['celular']) {
-      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dCelRec = data['cliente']['celular'].trim();
+      let celular = data['cliente']['celular'].trim();
+      if (celular.indexOf(',') > -1) {
+        //Si el Celular tiene , (coma) entonces va enviar solo el primer valor, ya que SIFEN no acepta Comas
+        celular = celular.split(',')[0].trim();
+      }
+
+      this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dCelRec = celular;
     }
     if (data['cliente']['email']) {
       let email = new String(data['cliente']['email']); //Hace una copia, para no alterar.
@@ -691,14 +697,6 @@ class ReciboXmlMainService {
         email = email.split(',')[0].trim();
       }
 
-      //Verificar espacios
-      if (email.indexOf(' ') > -1) {
-        //throw new Error("El valor '" + email + "' en data.cliente.email no puede poseer espacios");
-      }
-
-      if (!(email.length >= 3 && email.length <= 80)) {
-        //throw new Error("El valor '" + email + "' en data.cliente.email debe tener una longitud de 3 a 80 caracteres");
-      }
       this.json['rDE']['recibo']['gDatGralOpe']['gDatRec'].dEmailRec = email.trim();
     }
 
