@@ -106,6 +106,7 @@ class JsonReciboDocumentoAsociadoService {
 
     jsonResult['montoRetencionIva'] = 0;
     jsonResult['montoRetencionRenta'] = 0;
+    jsonResult['montoRetencionLey2051'] = 0;
 
     if (typeof doumentoAsociado['montoRetencionIva'] != 'undefined') {
       let montoRetencionIva = +doumentoAsociado['montoRetencionIva'];
@@ -118,6 +119,13 @@ class JsonReciboDocumentoAsociadoService {
       let montoRetencionRenta = +doumentoAsociado['montoRetencionRenta'];
       if (montoRetencionRenta > 0) {
         jsonResult['montoRetencionRenta'] = parseFloat(montoRetencionRenta.toFixed(config.decimals));
+      }
+    }
+
+    if (typeof doumentoAsociado['montoRetencionLey2051'] != 'undefined') {
+      let montoRetencionLey2051 = +doumentoAsociado['montoRetencionLey2051'];
+      if (montoRetencionLey2051 > 0) {
+        jsonResult['montoRetencionLey2051'] = parseFloat(montoRetencionLey2051.toFixed(config.decimals));
       }
     }
 

@@ -261,6 +261,11 @@ class ReciboXmlMainService {
           delete docAso.monto_retencion_renta;
         }
 
+        if (typeof docAso.monto_retencion_ley2051 != 'undefined') {
+          docAso.montoRetencionLey2051 = docAso.monto_retencion_ley2051;
+          delete docAso.monto_retencion_ley2051;
+        }
+
         if (docAso.ruc_fusionado) {
           docAso.rucFusionado = docAso.ruc_fusionado;
           delete docAso.ruc_fusionado;
