@@ -627,17 +627,17 @@ class JSonReciboValidateService {
           }
 
           if (
-            constanteService.condicionesOperaciones.filter(
+            constanteService.tarjetasCreditosTipos.filter(
               (um: any) => um.codigo === dataEntrega['infoTarjeta']['tipo'],
             ).length == 0
           ) {
             this.errors.push(
-              "Tipo de Tarjeta de Crédito '" +
+              "Tipo de Tarjeta de Crédito22 '" +
                 dataEntrega['infoTarjeta']['tipo'] +
                 "' en data.condicion.entregas[" +
                 i +
                 '].infoTarjeta.tipo no encontrado. Valores: ' +
-                constanteService.condicionesOperaciones.map((a: any) => a.codigo + '-' + a.descripcion),
+                constanteService.tarjetasCreditosTipos.map((a: any) => a.codigo + '-' + a.descripcion),
             );
           }
 
