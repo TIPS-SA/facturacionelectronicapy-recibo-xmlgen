@@ -1,6 +1,6 @@
 {
   "name": "facturacionelectronicapy-recibo-xmlgen",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "API Node JS para generar el archivo XML del Recibo similar al exigido por SIFEN en base a JSON",
   "main": "dist/index.js",
   "scripts": {
